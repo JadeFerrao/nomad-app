@@ -31,6 +31,13 @@ const PencilIcon = () => (
   </svg>
 );
 
+const VerifiedIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, filter: 'drop-shadow(0 0 4px rgba(78, 205, 196, 0.4))' }}>
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="#4ecdc4" />
+    <path d="M9 12l2 2 4-4" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
 /* ── Types ── */
 type BudgetTier = "budget" | "mid" | "luxury";
 
@@ -45,6 +52,8 @@ interface ItineraryDisplayProps {
   days: number;
   selections: BudgetSelections;
   aiItinerary?: any;
+  currency: string;
+  people: number;
 }
 
 /* ── Itinerary Data ── */
@@ -680,8 +689,9 @@ const st: Record<string, React.CSSProperties> = {
   },
 };
 
-export default function ItineraryDisplay({ destination, days, selections, aiItinerary }: ItineraryDisplayProps) {
+export default function ItineraryDisplay({ destination, days, selections, aiItinerary, currency, people }: ItineraryDisplayProps) {
   const [itineraryData, setItineraryData] = React.useState<any>(null);
+  const [isRecalculating, setIsRecalculating] = React.useState(false);
 
   React.useEffect(() => {
     if (aiItinerary) {
@@ -693,6 +703,33 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
   const data = itineraryData;
   if (!data) return null;
 
+  const recalculateBudget = async (updatedData: any) => {
+    setIsRecalculating(true);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/generate-itinerary`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          mode: 'recalculate',
+          itinerary: updatedData,
+          currency,
+          people
+        }),
+      });
+      const result = await response.json();
+      if (result.total_budget) {
+        setItineraryData({ ...updatedData, total_budget: result.total_budget, approx_flight_budget: result.approx_flight_budget });
+      }
+    } catch (err) {
+      console.error("Recalculation error:", err);
+    } finally {
+      setIsRecalculating(false);
+    }
+  };
+
   const handleEdit = (e: React.MouseEvent, dayIndex: number, category: string, currentItem: any) => {
     e.stopPropagation();
     const newName = window.prompt(`Edit ${category} for Day ${dayIndex + 1}:`, currentItem.name);
@@ -703,6 +740,7 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
       // Also update location_url to be safe
       newData.days[dayIndex][category][tier].location_url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(newName)}`;
       setItineraryData(newData);
+      recalculateBudget(newData);
     }
   };
 
@@ -722,7 +760,35 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
-          <p style={st.headerLabel}>Your Itinerary</p>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
+            <span style={{ 
+              fontFamily: 'var(--font-sans)', 
+              fontSize: '10px', 
+              fontWeight: 700, 
+              color: 'var(--color-ash)', 
+              letterSpacing: '0.2em', 
+              textTransform: 'uppercase',
+              marginBottom: '4px'
+            }}>CURATION</span>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '6px', 
+              background: 'rgba(255,255,255,0.05)', 
+              padding: '6px 12px', 
+              borderRadius: '20px', 
+              border: '1px solid rgba(255,255,255,0.1)' 
+            }}>
+              <VerifiedIcon />
+              <span style={{ 
+                fontFamily: 'var(--font-sans)', 
+                fontSize: '13px', 
+                fontWeight: 600, 
+                color: 'var(--color-white)',
+                letterSpacing: '0.02em'
+              }}>Nomad Verified</span>
+            </div>
+          </div>
           <h2 style={st.headerTitle}>
             {data.name}
           </h2>
@@ -753,11 +819,24 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <div>
-            <span style={st.summaryLabel}>Total Estimated Budget</span>
-            <div style={st.totalPrice}>{data.total_budget || "Calculated on request"}</div>
-            <p style={{ color: 'var(--color-ash)', fontSize: '12px', marginTop: '8px', fontFamily: 'var(--font-sans)' }}>
-              *Estimated based on your selected "{tierLabels[selections.stay]}" stay, "{tierLabels[selections.eat]}" food, and "{tierLabels[selections.explore]}" activities.
+          <div style={{ flex: 1.2 }}>
+            <span style={st.summaryLabel}>Total Estimated Budget (Incl. Flights)</span>
+            <div style={{...st.totalPrice, color: isRecalculating ? 'var(--color-silver)' : 'var(--color-white)', transition: 'color 0.3s'}}>
+              {isRecalculating ? "Recalculating..." : (data.total_budget || "Calculated on request")}
+            </div>
+            
+            <div style={{ marginTop: 'var(--space-6)', padding: 'var(--space-4)', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', opacity: 0.7 }}>
+                <span style={{ fontSize: '12px', fontFamily: 'var(--font-sans)' }}>Approx Flights ({people} Flyers)</span>
+                <span style={{ fontSize: '13px', fontFamily: 'var(--font-mono)', color: 'var(--color-accent)' }}>{data.approx_flight_budget || "—"}</span>
+              </div>
+              <p style={{ color: 'var(--color-ash)', fontSize: '11px', marginTop: '4px', fontFamily: 'var(--font-sans)', fontStyle: 'italic' }}>
+                *Flight prices are indicative and vary by airline.
+              </p>
+            </div>
+
+            <p style={{ color: 'var(--color-ash)', fontSize: '12px', marginTop: 'var(--space-4)', fontFamily: 'var(--font-sans)' }}>
+              *Estimated based on your selected "{tierLabels[selections.stay]}" stay and transportation.
             </p>
           </div>
           

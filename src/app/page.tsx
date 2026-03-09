@@ -24,26 +24,30 @@ interface TripData {
   days: number;
   selections: BudgetSelections;
   people: number;
+  startDate: string;
+  endDate: string;
 }
 
 export default function Home() {
   const [tripData, setTripData] = useState<TripData | null>(null);
   const [itinerary, setItinerary] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [currency, setCurrency] = useState("USD");
 
-  const handlePlanTrip = async (destinations: string[], days: number, selections: BudgetSelections, currency: string, people: number) => {
+  const handlePlanTrip = async (destinations: string[], days: number, selections: BudgetSelections, selectedCurrency: string, people: number, startDate: string, endDate: string) => {
     setIsLoading(true);
     setTripData(null);
     setItinerary(null);
     
     try {
+      setCurrency(selectedCurrency);
       const { data, error } = await supabase.functions.invoke("generate-itinerary", {
-        body: { destinations, days, selections, currency, people },
+        body: { destinations, days, selections, currency: selectedCurrency, people, startDate, endDate },
       });
       
       if (error) throw error;
       
-      setTripData({ destinations, days, selections, people });
+      setTripData({ destinations, days, selections, people, startDate, endDate });
       setItinerary(data);
 
       // Scroll to itinerary after a short delay
@@ -81,6 +85,8 @@ export default function Home() {
               days={tripData.days}
               selections={tripData.selections}
               aiItinerary={itinerary}
+              currency={currency}
+              people={tripData.people}
             />
           </motion.div>
         )}
