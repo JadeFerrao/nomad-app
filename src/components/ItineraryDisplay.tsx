@@ -31,12 +31,21 @@ const PencilIcon = () => (
   </svg>
 );
 
-const VerifiedIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, filter: 'drop-shadow(0 0 4px rgba(78, 205, 196, 0.4))' }}>
-    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="#4ecdc4" />
-    <path d="M9 12l2 2 4-4" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+const NomadBadge = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M11.5283 1.5999C11.7686 1.29437 12.2314 1.29437 12.4717 1.5999L14.2805 3.90051C14.4309 4.09173 14.6818 4.17325 14.9158 4.10693L17.7314 3.3089C18.1054 3.20292 18.4799 3.475 18.4946 3.86338L18.6057 6.78783C18.615 7.03089 18.77 7.24433 18.9984 7.32823L21.7453 8.33761C22.1101 8.47166 22.2532 8.91189 22.0368 9.23478L20.4078 11.666C20.2724 11.8681 20.2724 12.1319 20.4078 12.334L22.0368 14.7652C22.2532 15.0881 22.1101 15.5283 21.7453 15.6624L18.9984 16.6718C18.77 16.7557 18.615 16.9691 18.6057 17.2122L18.4946 20.1366C18.4799 20.525 18.1054 20.7971 17.7314 20.6911L14.9158 19.8931C14.6818 19.8267 14.4309 19.9083 14.2805 20.0995L12.4717 22.4001C12.2314 22.7056 11.7686 22.7056 11.5283 22.4001L9.71949 20.0995C9.56915 19.9083 9.31823 19.8267 9.08421 19.8931L6.26856 20.6911C5.89463 20.7971 5.52014 20.525 5.50539 20.1366L5.39427 17.2122C5.38503 16.9691 5.22996 16.7557 5.00164 16.6718L2.25467 15.6624C1.88986 15.5283 1.74682 15.0881 1.96317 14.7652L3.59221 12.334C3.72761 12.1319 3.72761 11.8681 3.59221 11.666L1.96317 9.23478C1.74682 8.91189 1.88986 8.47166 2.25467 8.33761L5.00165 7.32823C5.22996 7.24433 5.38503 7.03089 5.39427 6.78783L5.50539 3.86338C5.52014 3.475 5.89463 3.20292 6.26857 3.3089L9.08421 4.10693C9.31823 4.17325 9.56915 4.09173 9.71949 3.90051L11.5283 1.5999Z" stroke="currentColor" strokeWidth="1.5" />
+    <path d="M9 12L11 14L15 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
+
+const DownloadIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <polyline points="7 10 12 15 17 10" />
+    <line x1="12" y1="15" x2="12" y2="3" />
+  </svg>
+);
+
 
 /* ── Types ── */
 type BudgetTier = "budget" | "mid" | "luxury";
@@ -699,6 +708,11 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
     }
   }, [aiItinerary]);
 
+  const handleDownloadPDF = () => {
+    window.print();
+  };
+
+
   // Use AI generated data instead of hardcoded data
   const data = itineraryData;
   if (!data) return null;
@@ -752,7 +766,8 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
 
   return (
     <section id="itinerary" style={st.section}>
-      <div style={st.container}>
+      <div style={st.container} className="itinerary-container">
+
         {/* Header */}
         <motion.div
           style={st.header}
@@ -761,41 +776,78 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
-            <span style={{ 
-              fontFamily: 'var(--font-sans)', 
-              fontSize: '10px', 
-              fontWeight: 700, 
-              color: 'var(--color-ash)', 
-              letterSpacing: '0.2em', 
+            <span style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: '10px',
+              fontWeight: 700,
+              color: 'var(--color-ash)',
+              letterSpacing: '0.2em',
               textTransform: 'uppercase',
               marginBottom: '4px'
             }}>CURATION</span>
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '6px', 
-              background: 'rgba(255,255,255,0.05)', 
-              padding: '6px 12px', 
-              borderRadius: '20px', 
-              border: '1px solid rgba(255,255,255,0.1)' 
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: 'rgba(255,255,255,0.05)',
+              padding: '6px 12px',
+              borderRadius: '20px',
+              border: '1px solid rgba(255,255,255,0.1)',
+              position: 'relative'
             }}>
-              <VerifiedIcon />
-              <span style={{ 
-                fontFamily: 'var(--font-sans)', 
-                fontSize: '13px', 
-                fontWeight: 600, 
+              <span style={{ color: 'var(--color-accent)', display: 'flex', alignItems: 'center' }}>
+                <NomadBadge />
+              </span>
+              <span style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: '13px',
+                fontWeight: 600,
                 color: 'var(--color-white)',
                 letterSpacing: '0.02em'
               }}>Nomad Verified</span>
             </div>
           </div>
-          <h2 style={st.headerTitle}>
-            {data.name}
-          </h2>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 'var(--space-8)', marginBottom: 'var(--space-2)' }}>
+            <h2 style={{ ...st.headerTitle, marginBottom: 0 }}>
+              {data.name}
+            </h2>
+            <button
+              onClick={handleDownloadPDF}
+              className="no-print"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 16px',
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '8px',
+                color: 'var(--color-white)',
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                fontFamily: 'var(--font-sans)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+                e.currentTarget.style.borderColor = 'var(--color-accent)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+              }}
+            >
+              <DownloadIcon />
+              Download as PDF
+            </button>
+          </div>
+
           <p style={st.headerSub}>{displayDays.length} Days Itinerary — Curated just for you</p>
 
           {/* Mix badges */}
-          <div style={st.mixBadges}>
+          <div style={st.mixBadges} className="mix-badges-container">
+
             {categories.map((cat) => (
               <span
                 key={cat}
@@ -821,10 +873,10 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
         >
           <div style={{ flex: 1.2 }}>
             <span style={st.summaryLabel}>Total Estimated Budget (Incl. Flights)</span>
-            <div style={{...st.totalPrice, color: isRecalculating ? 'var(--color-silver)' : 'var(--color-white)', transition: 'color 0.3s'}}>
+            <div style={{ ...st.totalPrice, color: isRecalculating ? 'var(--color-silver)' : 'var(--color-white)', transition: 'color 0.3s' }}>
               {isRecalculating ? "Recalculating..." : (data.total_budget || "Calculated on request")}
             </div>
-            
+
             <div style={{ marginTop: 'var(--space-6)', padding: 'var(--space-4)', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', opacity: 0.7 }}>
                 <span style={{ fontSize: '12px', fontFamily: 'var(--font-sans)' }}>Approx Flights ({people} Flyers)</span>
@@ -839,7 +891,7 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
               *Estimated based on your selected "{tierLabels[selections.stay]}" stay and transportation.
             </p>
           </div>
-          
+
           <div>
             <span style={st.summaryLabel}>Travel Requirements & Tips</span>
             <ul style={st.reqList}>
@@ -863,6 +915,8 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
             <motion.div
               key={i}
               style={st.dayCard}
+              className="day-card"
+
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{
@@ -933,13 +987,13 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
                           <span style={st.itemName}>{item.name.length > 20 ? item.name.substring(0, 20) + "..." : item.name}</span>
-                          <button 
+                          <button
                             onClick={(e) => handleEdit(e, i, cat, item)}
-                            style={{ 
-                              background: 'none', 
-                              border: 'none', 
-                              padding: 4, 
-                              cursor: 'pointer', 
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              padding: 4,
+                              cursor: 'pointer',
                               color: 'var(--color-silver)',
                               opacity: 0.5,
                               display: 'flex',
@@ -967,7 +1021,91 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
             grid-template-columns: repeat(3, 1fr) !important;
           }
         }
+
+        @media print {
+          /* Hide non-essential elements */
+          nav, footer, .no-print, button, .mix-badges-container {
+            display: none !important;
+          }
+
+          /* Force clean background and layout */
+          body, #itinerary {
+            background: #fff !important;
+            color: #111 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+          }
+
+          #itinerary {
+            min-height: auto !important;
+          }
+          
+          .itinerary-container {
+             max-width: 100% !important;
+             margin: 0 !important;
+             padding: 40px !important;
+          }
+
+          /* Single column for print */
+          .itinerary-day-grid {
+            grid-template-columns: 1fr !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 12px !important;
+          }
+
+          /* Aesthetic card replacements for print */
+          [style*="background: rgba(255, 255, 255, 0.03)"],
+          [style*="background:rgba(255, 255, 255, 0.03)"],
+          [style*="rgba(255,255,255,0.05)"] {
+            background: #fdfdfd !important;
+            border-color: #ddd !important;
+            border-radius: 12px !important;
+            box-shadow: none !important;
+          }
+
+          /* Text colors for legibility */
+          h2, h3, span, p, li {
+            color: #111 !important;
+            text-shadow: none !important;
+          }
+
+          [style*="var(--color-white)"] {
+            color: #111 !important;
+          }
+
+          [style*="var(--color-ash)"],
+          [style*="var(--color-silver)"] {
+            color: #444 !important;
+          }
+
+          [style*="var(--color-accent)"] {
+            color: #c8a55a !important; /* Force a dark gold for print */
+          }
+
+          /* Timeline line adjustments */
+          [style*="linear-gradient"] {
+             background: #c8a55a !important;
+          }
+
+          /* Ensure images and colors show up */
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+
+          .day-card {
+            break-inside: avoid;
+            page-break-inside: avoid;
+            margin-bottom: 40px !important;
+          }
+
+          img {
+            border: 1px solid #ddd !important;
+          }
+        }
       `}</style>
+
     </section>
   );
 }
