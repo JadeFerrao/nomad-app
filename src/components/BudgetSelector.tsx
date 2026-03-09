@@ -15,7 +15,8 @@ interface BudgetSelections {
 }
 
 interface BudgetSelectorProps {
-  onPlanTrip: (destinations: string[], days: number, selections: BudgetSelections) => void;
+  onPlanTrip: (destinations: string[], days: number, selections: BudgetSelections, currency: string, people: number) => void;
+  isLoading?: boolean;
 }
 
 /* ── SVG Icons ── */
@@ -194,9 +195,9 @@ const categoryInfo: Record<Category, {
     label: "Explore",
     icon: (c) => <ExploreIcon color={c} />,
     descriptions: {
-      budget: "Walking Tours & Public Transit",
-      mid: "Guided Tours & Day Trips",
-      luxury: "Private Tours & Exclusive Access",
+      budget: "Public Transport & Walking",
+      mid: "Cabs & Guided Tours",
+      luxury: "Private Cabs or Coaches",
     },
   },
 };
@@ -251,9 +252,10 @@ const s: Record<string, React.CSSProperties> = {
   /* Custom Dropdown */
   dropdownRow: {
     display: "grid",
-    gridTemplateColumns: "1fr",
+    gridTemplateColumns: "1.5fr 1fr",
     gap: "var(--space-6)",
     marginBottom: "var(--space-8)",
+    alignItems: "end",
   },
   fieldLabel: {
     fontFamily: "var(--font-sans)",
@@ -660,9 +662,11 @@ function DestinationDropdown({
 }
 
 /* ── Main Component ── */
-export default function BudgetSelector({ onPlanTrip }: BudgetSelectorProps) {
+export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelectorProps) {
   const [selectedDestinations, setSelectedDestinations] = useState<string[]>(["paris"]);
   const [days, setDays] = useState(5);
+  const [people, setPeople] = useState(2);
+  const [currency, setCurrency] = useState("USD");
   const [error, setError] = useState<string | null>(null);
   const [selections, setSelections] = useState<BudgetSelections>({
     stay: "mid",
@@ -715,7 +719,7 @@ export default function BudgetSelector({ onPlanTrip }: BudgetSelectorProps) {
       setError("Destinations are too far apart. Please select countries within a similar region (e.g. SE Asia, Europe).");
       return;
     }
-    onPlanTrip(selectedDestinations, days, selections);
+    onPlanTrip(selectedDestinations, days, selections, currency, people);
   };
 
   useEffect(() => {
@@ -786,22 +790,52 @@ export default function BudgetSelector({ onPlanTrip }: BudgetSelectorProps) {
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
         >
-          {/* Destination & Duration */}
+          {/* Destination & Duration & Currency */}
           <div style={s.dropdownRow} className="budget-input-grid">
             <div>
               <label style={s.fieldLabel}>Destinations (Multi-select)</label>
               <DestinationDropdown values={selectedDestinations} onChange={setSelectedDestinations} />
             </div>
-            <div>
-              <label style={s.fieldLabel}>Duration (Days)</label>
-              <input
-                type="number"
-                min={1}
-                max={30}
-                value={days}
-                onChange={(e) => setDays(Math.max(1, Math.min(30, parseInt(e.target.value) || 1)))}
-                style={s.input}
-              />
+            <div style={{ display: 'grid', gridTemplateColumns: '80px 80px 1fr', gap: 'var(--space-4)' }}>
+              <div>
+                <label style={s.fieldLabel}>Duration</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={30}
+                  value={days}
+                  onChange={(e) => setDays(Math.max(1, Math.min(30, parseInt(e.target.value) || 1)))}
+                  style={s.input}
+                />
+              </div>
+              <div>
+                <label style={s.fieldLabel}>Travelers</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={10}
+                  value={people}
+                  onChange={(e) => setPeople(Math.max(1, Math.min(10, parseInt(e.target.value) || 1)))}
+                  style={s.input}
+                />
+              </div>
+              <div>
+                <label style={s.fieldLabel}>Currency</label>
+                <select
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value)}
+                  style={{ ...s.input, appearance: 'none', backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'white\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'/%3e%3c/svg%3e")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center', backgroundSize: '16px' }}
+                >
+                  <option value="USD">USD ($)</option>
+                  <option value="EUR">EUR (€)</option>
+                  <option value="INR">INR (₹)</option>
+                  <option value="GBP">GBP (£)</option>
+                  <option value="JPY">JPY (¥)</option>
+                  <option value="AUD">AUD ($)</option>
+                  <option value="CAD">CAD ($)</option>
+                  <option value="SGD">SGD ($)</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -898,12 +932,15 @@ export default function BudgetSelector({ onPlanTrip }: BudgetSelectorProps) {
               variant="primary"
               size="lg"
               onClick={handleGenerate}
-              style={{ minWidth: 260 }}
+              disabled={isLoading}
+              style={{ minWidth: 260, opacity: isLoading ? 0.7 : 1, color: "var(--color-black)", fontWeight: 600 }}
             >
-              Generate Itinerary
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
+              {isLoading ? "Generating Itinerary..." : "Generate Itinerary"}
+              {!isLoading && (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              )}
             </Button>
           </div>
         </motion.div>

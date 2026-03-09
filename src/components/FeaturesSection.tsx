@@ -52,7 +52,7 @@ const features = [
     icon: <CameraIcon />,
     title: "Visual Planning",
     description:
-      "See real photos of every hotel, café, and landmark before you book. No surprises on arrival.",
+      "See real photos of every hotel, café, and landmark before you plan your itinerary. No surprises on arrival.",
   },
   {
     icon: <BoltIcon />,

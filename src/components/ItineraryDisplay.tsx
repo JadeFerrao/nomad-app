@@ -25,6 +25,12 @@ const ExploreIconSm = () => (
   </svg>
 );
 
+const PencilIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+  </svg>
+);
+
 /* ── Types ── */
 type BudgetTier = "budget" | "mid" | "luxury";
 
@@ -38,6 +44,7 @@ interface ItineraryDisplayProps {
   destination: string;
   days: number;
   selections: BudgetSelections;
+  aiItinerary?: any;
 }
 
 /* ── Itinerary Data ── */
@@ -517,13 +524,58 @@ const st: Record<string, React.CSSProperties> = {
     position: "relative" as const,
     paddingLeft: 32,
   },
+  summaryCard: {
+    background: "rgba(255, 255, 255, 0.03)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    borderRadius: "var(--radius-xl)",
+    padding: "var(--space-8)",
+    marginBottom: "var(--space-16)",
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+    gap: "var(--space-8)",
+    textAlign: "left" as const,
+  },
+  summaryLabel: {
+    fontFamily: "var(--font-sans)",
+    fontSize: "10px",
+    fontWeight: 700,
+    textTransform: "uppercase" as const,
+    color: "var(--color-accent)",
+    letterSpacing: "0.15em",
+    marginBottom: "var(--space-4)",
+    display: "block",
+  },
+  totalPrice: {
+    fontFamily: "var(--font-serif)",
+    fontSize: "2.5rem",
+    color: "var(--color-white)",
+    fontWeight: 600,
+    letterSpacing: "-0.03em",
+  },
+  reqList: {
+    display: "flex",
+    flexDirection: "column" as const,
+    gap: "var(--space-3)",
+    padding: 0,
+    margin: 0,
+    listStyle: "none",
+  },
+  reqItem: {
+    fontFamily: "var(--font-sans)",
+    fontSize: "var(--text-sm)",
+    color: "var(--color-silver)",
+    display: "flex",
+    alignItems: "flex-start",
+    gap: "var(--space-3)",
+    lineHeight: "1.5",
+  },
   timelineLine: {
     position: "absolute" as const,
     left: 11,
-    top: 0,
+    top: 15,
     bottom: 0,
-    width: 2,
-    background: "linear-gradient(180deg, var(--color-accent), rgba(200, 165, 90, 0.1))",
+    width: 1,
+    background: "linear-gradient(180deg, var(--color-accent), transparent)",
   },
   dayCard: {
     position: "relative" as const,
@@ -531,23 +583,21 @@ const st: Record<string, React.CSSProperties> = {
   },
   dayDot: {
     position: "absolute" as const,
-    left: -32,
+    left: -28,
     top: 6,
-    width: 24,
-    height: 24,
+    width: 14,
+    height: 14,
     borderRadius: "50%",
-    background: "rgba(255, 255, 255, 0.02)",
-    backdropFilter: "blur(8px)",
-    WebkitBackdropFilter: "blur(8px)",
-    border: "1px solid rgba(255, 255, 255, 0.06)",
+    background: "var(--color-black)",
+    border: "2px solid rgba(200, 165, 90, 0.4)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     zIndex: 2,
   },
   dayDotInner: {
-    width: 8,
-    height: 8,
+    width: 6,
+    height: 6,
     borderRadius: "50%",
     background: "var(--color-accent)",
   },
@@ -582,8 +632,6 @@ const st: Record<string, React.CSSProperties> = {
     padding: "var(--space-4)",
     borderRadius: "var(--radius-lg)",
     background: "rgba(255, 255, 255, 0.03)",
-    backdropFilter: "blur(12px)",
-    WebkitBackdropFilter: "blur(12px)",
     border: "1px solid rgba(255, 255, 255, 0.08)",
     transition: "all 300ms cubic-bezier(0.16, 1, 0.3, 1)",
     overflow: "hidden",
@@ -632,14 +680,34 @@ const st: Record<string, React.CSSProperties> = {
   },
 };
 
-export default function ItineraryDisplay({ destination, days, selections }: ItineraryDisplayProps) {
-  const data = destinationData[destination];
+export default function ItineraryDisplay({ destination, days, selections, aiItinerary }: ItineraryDisplayProps) {
+  const [itineraryData, setItineraryData] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    if (aiItinerary) {
+      setItineraryData(aiItinerary);
+    }
+  }, [aiItinerary]);
+
+  // Use AI generated data instead of hardcoded data
+  const data = itineraryData;
   if (!data) return null;
 
-  // Ensure displayDays has precisely the number of items specified by the 'days' prop
-  // If user wants more days than data, we cycle through the data to pad it
-  const displayDays = Array.from({ length: days }, (_, i) => {
-    const dayData = data.days[i % data.days.length];
+  const handleEdit = (e: React.MouseEvent, dayIndex: number, category: string, currentItem: any) => {
+    e.stopPropagation();
+    const newName = window.prompt(`Edit ${category} for Day ${dayIndex + 1}:`, currentItem.name);
+    if (newName && newName !== currentItem.name) {
+      const newData = { ...itineraryData };
+      const tier = selections[category as keyof BudgetSelections];
+      newData.days[dayIndex][category][tier].name = newName;
+      // Also update location_url to be safe
+      newData.days[dayIndex][category][tier].location_url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(newName)}`;
+      setItineraryData(newData);
+    }
+  };
+
+  // The generated data should already have exactly the right amount of days
+  const displayDays = data.days.slice(0, days).map((dayData: any, i: number) => {
     return { ...dayData, number: i + 1 };
   });
   const categories: Array<"stay" | "eat" | "explore"> = ["stay", "eat", "explore"];
@@ -656,9 +724,9 @@ export default function ItineraryDisplay({ destination, days, selections }: Itin
         >
           <p style={st.headerLabel}>Your Itinerary</p>
           <h2 style={st.headerTitle}>
-            {displayDays.length} Days in {data.name}
+            {data.name}
           </h2>
-          <p style={st.headerSub}>Curated just for you</p>
+          <p style={st.headerSub}>{displayDays.length} Days Itinerary — Curated just for you</p>
 
           {/* Mix badges */}
           <div style={st.mixBadges}>
@@ -678,10 +746,41 @@ export default function ItineraryDisplay({ destination, days, selections }: Itin
           </div>
         </motion.div>
 
+        {/* Summary Card */}
+        <motion.div
+          style={st.summaryCard}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <div>
+            <span style={st.summaryLabel}>Total Estimated Budget</span>
+            <div style={st.totalPrice}>{data.total_budget || "Calculated on request"}</div>
+            <p style={{ color: 'var(--color-ash)', fontSize: '12px', marginTop: '8px', fontFamily: 'var(--font-sans)' }}>
+              *Estimated based on your selected "{tierLabels[selections.stay]}" stay, "{tierLabels[selections.eat]}" food, and "{tierLabels[selections.explore]}" activities.
+            </p>
+          </div>
+          
+          <div>
+            <span style={st.summaryLabel}>Travel Requirements & Tips</span>
+            <ul style={st.reqList}>
+              {(data.requirements || ["Check your local visa entry requirements", "Travel insurance is highly recommended", "Currency exchange available at city center"]).map((req: string, idx: number) => (
+                <li key={idx} style={st.reqItem}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="2" style={{ marginTop: '2px', flexShrink: 0 }}>
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                  </svg>
+                  {req}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </motion.div>
+
         {/* Timeline */}
         <div style={st.timeline}>
           <div style={st.timelineLine} />
-          {displayDays.map((day, i) => (
+          {displayDays.map((day: any, i: number) => (
             <motion.div
               key={i}
               style={st.dayCard}
@@ -704,6 +803,21 @@ export default function ItineraryDisplay({ destination, days, selections }: Itin
                 <span style={st.dayTitle}>{day.title}</span>
               </div>
 
+              {/* Day Description (Flights, Transit, etc) */}
+              {day.description && (
+                <p style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '14px',
+                  color: 'var(--color-silver)',
+                  lineHeight: '1.6',
+                  marginBottom: 'var(--space-6)',
+                  maxWidth: '700px',
+                  opacity: 0.8
+                }}>
+                  {day.description}
+                </p>
+              )}
+
               {/* Day items */}
               <div style={st.dayItems} className="itinerary-day-grid">
                 {categories.map((cat) => {
@@ -712,11 +826,15 @@ export default function ItineraryDisplay({ destination, days, selections }: Itin
                   return (
                     <motion.div
                       key={cat}
-                      style={st.itemCard}
+                      style={{ ...st.itemCard, cursor: 'pointer' }}
                       whileHover={{
                         borderColor: `${tierColors[tier]}40`,
                         y: -2,
                         boxShadow: `0 8px 24px rgba(0,0,0,0.3)`,
+                      }}
+                      onClick={() => {
+                        const url = item.location_url || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.name)}`;
+                        window.open(url, "_blank");
                       }}
                       transition={{ duration: 0.2 }}
                     >
@@ -734,7 +852,25 @@ export default function ItineraryDisplay({ destination, days, selections }: Itin
                             {categoryLabels[cat]}
                           </span>
                         </div>
-                        <span style={st.itemName}>{item.name}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                          <span style={st.itemName}>{item.name.length > 20 ? item.name.substring(0, 20) + "..." : item.name}</span>
+                          <button 
+                            onClick={(e) => handleEdit(e, i, cat, item)}
+                            style={{ 
+                              background: 'none', 
+                              border: 'none', 
+                              padding: 4, 
+                              cursor: 'pointer', 
+                              color: 'var(--color-silver)',
+                              opacity: 0.5,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            <PencilIcon />
+                          </button>
+                        </div>
                         <span style={st.itemPrice}>{item.price}</span>
                       </div>
                     </motion.div>
