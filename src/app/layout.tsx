@@ -33,6 +33,9 @@ export const metadata: Metadata = {
       "Mix & match budget tiers for stays, food, and experiences. Plan your dream trip in seconds.",
     type: "website",
   },
+  icons: {
+    icon: "/icon.png",
+  },
 };
 
 export default function RootLayout({

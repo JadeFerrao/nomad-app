@@ -100,8 +100,8 @@ export default function Navbar() {
     <nav style={{ ...navStyles.nav, ...(scrolled ? navStyles.navScrolled : {}) }}>
       <div style={navStyles.inner}>
         <Link href="/" style={navStyles.logoWrap}>
-          <div style={navStyles.logoIcon}>N</div>
-          <span style={navStyles.logoText}>Nomad</span>
+          <img src="/icon.png" alt="Nomad" style={{ height: 30, borderRadius: "var(--radius-lg)" }} />
+          <span style={{ fontFamily: "var(--font-serif)", fontSize: "var(--text-xl)", fontWeight: 600, color: "var(--color-white)", letterSpacing: "0.05em", textTransform: "uppercase" }}>Nomad</span>
         </Link>
 
         {/* Empty right side — clean minimal header */}

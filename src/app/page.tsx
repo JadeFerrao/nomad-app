@@ -19,7 +19,7 @@ interface BudgetSelections {
 }
 
 interface TripData {
-  destination: string;
+  destinations: string[];
   days: number;
   selections: BudgetSelections;
 }
@@ -27,8 +27,8 @@ interface TripData {
 export default function Home() {
   const [tripData, setTripData] = useState<TripData | null>(null);
 
-  const handlePlanTrip = (destination: string, days: number, selections: BudgetSelections) => {
-    setTripData({ destination, days, selections });
+  const handlePlanTrip = (destinations: string[], days: number, selections: BudgetSelections) => {
+    setTripData({ destinations, days, selections });
 
     // Scroll to itinerary after a short delay
     setTimeout(() => {
@@ -42,6 +42,7 @@ export default function Home() {
       <Navbar />
       <Marquee />
       <HeroSection />
+      <FeaturesSection />
       <BudgetSelector onPlanTrip={handlePlanTrip} />
 
       <AnimatePresence>
@@ -54,7 +55,7 @@ export default function Home() {
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
             <ItineraryDisplay
-              destination={tripData.destination}
+              destination={tripData.destinations[0]} // Temp fallback for display
               days={tripData.days}
               selections={tripData.selections}
             />

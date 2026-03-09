@@ -54,6 +54,7 @@ const footerStyles: Record<string, React.CSSProperties> = {
     fontSize: "var(--text-sm)",
     color: "var(--color-silver)",
     lineHeight: 1.7,
+    paddingTop: "var(--space-4)",
   },
   column: {},
   colTitle: {
@@ -126,12 +127,12 @@ export default function Footer() {
         <div style={footerStyles.grid} className="footer-grid">
           {/* Brand */}
           <div style={footerStyles.brand}>
-            <div style={footerStyles.logoWrap}>
-              <div style={footerStyles.logoIcon}>N</div>
-              <span style={footerStyles.logoText}>Nomad</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", marginBottom: "var(--space-2)" }}>
+              <img src="/icon.png" alt="Nomad" style={{ height: 30, borderRadius: "var(--radius-lg)" }} />
+              <span style={{ fontFamily: "var(--font-serif)", fontSize: "var(--text-xl)", fontWeight: 600, color: "var(--color-white)", letterSpacing: "0.05em", textTransform: "uppercase" }}>Nomad</span>
             </div>
             <p style={footerStyles.brandDesc}>
-              Curated travel experiences tailored to your style and budget. 
+              Curated travel experiences tailored to your style and budget.
               Explore the world, your way.
             </p>
           </div>
@@ -167,7 +168,7 @@ export default function Footer() {
 
         <div style={footerStyles.bottom}>
           <span style={footerStyles.copyright}>
-            © 2026 Nomad. All rights reserved.
+            © {new Date().getFullYear()} Nomad. All rights reserved.
           </span>
           <div style={footerStyles.socials}>
             {["𝕏", "IG", "in"].map((s) => (

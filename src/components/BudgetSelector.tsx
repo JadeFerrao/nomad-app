@@ -15,7 +15,7 @@ interface BudgetSelections {
 }
 
 interface BudgetSelectorProps {
-  onPlanTrip: (destination: string, days: number, selections: BudgetSelections) => void;
+  onPlanTrip: (destinations: string[], days: number, selections: BudgetSelections) => void;
 }
 
 /* ── SVG Icons ── */
@@ -73,6 +73,18 @@ const SearchIcon = () => (
   </svg>
 );
 
+const XIcon = ({ size = 14 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
+
+const AlertCircle = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+  </svg>
+);
+
 /* ── Destination Data ── */
 interface Destination {
   value: string;
@@ -80,51 +92,48 @@ interface Destination {
   country: string;
   region: string;
   image: string;
+  lat: number;
+  lng: number;
 }
 
 const destinations: Destination[] = [
   // Europe
-  { value: "paris", label: "Paris", country: "France", region: "Europe", image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=60&q=60" },
-  { value: "rome", label: "Rome", country: "Italy", region: "Europe", image: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=60&q=60" },
-  { value: "amalfi", label: "Amalfi Coast (South)", country: "Italy", region: "Europe", image: "https://images.unsplash.com/photo-1533903345306-15d1c30952de?w=60&q=60" },
-  { value: "dolomites", label: "Dolomites (North)", country: "Italy", region: "Europe", image: "https://images.unsplash.com/photo-1531310197839-ccf54634509e?w=60&q=60" },
-  { value: "barcelona", label: "Barcelona", country: "Spain", region: "Europe", image: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=60&q=60" },
-  { value: "london", label: "London", country: "UK", region: "Europe", image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=60&q=60" },
-  { value: "warsaw", label: "Warsaw", country: "Poland", region: "Europe", image: "https://images.unsplash.com/photo-1519197924294-4ba991a11128?w=60&q=60" },
-  { value: "bratislava", label: "Bratislava", country: "Slovakia", region: "Europe", image: "https://images.unsplash.com/photo-1564344498308-f472ce1ce16d?w=60&q=60" },
-  { value: "tbilisi", label: "Tbilisi", country: "Georgia", region: "Europe", image: "https://images.unsplash.com/photo-1565008418502-186085185d9c?w=60&q=60" },
-  { value: "moscow", label: "Moscow", country: "Russia", region: "Europe", image: "https://images.unsplash.com/photo-1513326738677-b964603b136d?w=60&q=60" },
-  { value: "istanbul", label: "Istanbul", country: "Turkey", region: "Europe", image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=60&q=60" },
-  { value: "cappadocia", label: "Cappadocia", country: "Turkey", region: "Europe", image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=60&q=60" },
+  { value: "paris", label: "Paris", country: "France", region: "Europe", image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400&q=80", lat: 48.8566, lng: 2.3522 },
+  { value: "rome", label: "Rome", country: "Italy", region: "Europe", image: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=400&q=80", lat: 41.9028, lng: 12.4964 },
+  { value: "london", label: "London", country: "UK", region: "Europe", image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&q=80", lat: 51.5074, lng: -0.1278 },
+  { value: "warsaw", label: "Warsaw", country: "Poland", region: "Europe", image: "https://images.unsplash.com/photo-1519197924294-4ba991a11128?w=400&q=80", lat: 52.2297, lng: 21.0122 },
+  { value: "bratislava", label: "Bratislava", country: "Slovakia", region: "Europe", image: "https://images.unsplash.com/photo-1564344498308-f472ce1ce16d?w=400&q=80", lat: 48.1486, lng: 17.1077 },
+  { value: "tbilisi", label: "Tbilisi", country: "Georgia", region: "Europe", image: "https://images.unsplash.com/photo-1518002171953-a080ee817e1f?w=400&q=80", lat: 41.7151, lng: 44.8271 },
+  { value: "moscow", label: "Moscow", country: "Russia", region: "Europe", image: "https://images.unsplash.com/photo-1513326738677-b964603b136d?w=400&q=80", lat: 55.7558, lng: 37.6173 },
+  { value: "istanbul", label: "Istanbul", country: "Turkey", region: "Europe", image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=400&q=80", lat: 41.0082, lng: 28.9784 },
+  { value: "cappadocia", label: "Cappadocia", country: "Turkey", region: "Europe", image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&q=80", lat: 38.6417, lng: 34.8453 },
+
   // Asia
-  { value: "tokyo", label: "Tokyo", country: "Japan", region: "Asia", image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=60&q=60" },
-  { value: "hokkaido", label: "Hokkaido (North)", country: "Japan", region: "Asia", image: "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=60&q=60" },
-  { value: "kyoto", label: "Kyoto (South)", country: "Japan", region: "Asia", image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=60&q=60" },
-  { value: "mumbai", label: "Mumbai", country: "India", region: "Asia", image: "https://images.unsplash.com/photo-1566552881560-0be862a7c445?w=60&q=60" },
-  { value: "assam", label: "Assam", country: "India", region: "Asia", image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=60&q=60" },
-  { value: "thimphu", label: "Thimphu", country: "Bhutan", region: "Asia", image: "https://images.unsplash.com/photo-1578516125863-30fec1761921?w=60&q=60" },
-  { value: "maldives", label: "Malé", country: "Maldives", region: "Asia", image: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=60&q=60" },
-  { value: "kuala_lumpur", label: "Kuala Lumpur", country: "Malaysia", region: "Asia", image: "https://images.unsplash.com/photo-1548013146-72479768bbaa?w=60&q=60" },
-  { value: "singapore", label: "Singapore", country: "Singapore", region: "Asia", image: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=60&q=60" },
-  { value: "hanoi", label: "Hanoi", country: "Vietnam", region: "Asia", image: "https://images.unsplash.com/photo-1509030450996-939a8dc516d3?w=60&q=60" },
-  { value: "ho_chi_minh", label: "Ho Chi Minh City", country: "Vietnam", region: "Asia", image: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=60&q=60" },
-  { value: "elNido", label: "El Nido", country: "Philippines", region: "Asia", image: "https://images.unsplash.com/photo-1516690561799-46d8f74f9abf?w=60&q=60" },
-  { value: "manila", label: "Manila", country: "Philippines", region: "Asia", image: "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=60&q=60" },
-  { value: "muscat", label: "Muscat", country: "Oman", region: "Asia", image: "https://images.unsplash.com/photo-1601640504107-7ea4c46f1f4b?w=60&q=60" },
-  { value: "doha", label: "Doha", country: "Qatar", region: "Asia", image: "https://images.unsplash.com/photo-1516108317508-6788f6a160e6?w=60&q=60" },
-  { value: "almaty", label: "Almaty", country: "Kazakhstan", region: "Asia", image: "https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?w=60&q=60" },
-  { value: "yerevan", label: "Yerevan", country: "Armenia", region: "Asia", image: "https://images.unsplash.com/photo-1563841930606-67e2b64dadad?w=60&q=60" },
+  { value: "tokyo", label: "Tokyo", country: "Japan", region: "Asia", image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&q=80", lat: 35.6762, lng: 139.6503 },
+  { value: "mumbai", label: "Mumbai", country: "India", region: "Asia", image: "https://images.unsplash.com/photo-1566552881560-0be862a7c445?w=800&q=80", lat: 19.076, lng: 72.8777 },
+  { value: "assam", label: "Assam", country: "India", region: "Asia", image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=800&q=80", lat: 26.2441, lng: 92.5378 },
+  { value: "bhutan", label: "Thimphu", country: "Bhutan", region: "Asia", image: "https://images.unsplash.com/photo-1578516125863-30fec1761921?w=400&q=80", lat: 27.4728, lng: 89.6339 },
+  { value: "maldives", label: "Malé", country: "Maldives", region: "Asia", image: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80", lat: 4.1755, lng: 73.5093 },
+  { value: "kuala_lumpur", label: "Kuala Lumpur", country: "Malaysia", region: "Asia", image: "https://images.unsplash.com/photo-1529391409740-59b2dea08ec6?w=800&q=80", lat: 3.139, lng: 101.6869 },
+  { value: "singapore", label: "Singapore", country: "Singapore", region: "Asia", image: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=800&q=80", lat: 1.3521, lng: 103.8198 },
+  { value: "hanoi", label: "Hanoi", country: "Vietnam", region: "Asia", image: "https://images.unsplash.com/photo-1509030450996-939a8dc516d3?w=800&q=80", lat: 21.0285, lng: 105.8542 },
+  { value: "elNido", label: "El Nido", country: "Philippines", region: "Asia", image: "https://images.unsplash.com/photo-1516690561799-46d8f74f9abf?w=800&q=80", lat: 11.1927, lng: 119.4124 },
+  { value: "manila", label: "Manila", country: "Philippines", region: "Asia", image: "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=400&q=80", lat: 14.5995, lng: 120.9842 },
+  { value: "muscat", label: "Muscat", country: "Oman", region: "Asia", image: "https://images.unsplash.com/photo-1541769420-57351bcd97b9?w=800&q=80", lat: 23.5859, lng: 58.4059 },
+  { value: "doha", label: "Doha", country: "Qatar", region: "Asia", image: "https://images.unsplash.com/photo-1516108317508-6788f6a160e6?w=400&q=80", lat: 25.2854, lng: 51.531 },
+  { value: "almaty", label: "Almaty", country: "Kazakhstan", region: "Asia", image: "https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?w=400&q=80", lat: 43.222, lng: 76.8512 },
+  { value: "yerevan", label: "Yerevan", country: "Armenia", region: "Asia", image: "https://images.unsplash.com/photo-1563841930606-67e2b64dadad?w=400&q=80", lat: 40.1772, lng: 44.5035 },
+
   // Americas
-  { value: "nyc", label: "New York", country: "USA", region: "Americas", image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=60&q=60" },
-  { value: "toronto", label: "Toronto", country: "Canada", region: "Americas", image: "https://images.unsplash.com/photo-1517090504586-fde19ea6066f?w=60&q=60" },
-  { value: "vancouver", label: "Vancouver", country: "Canada", region: "Americas", image: "https://images.unsplash.com/photo-1559511260-66a654ae982a?w=60&q=60" },
-  { value: "santiago", label: "Santiago", country: "Chile", region: "Americas", image: "https://images.unsplash.com/photo-1533130061792-64b345e4a833?w=60&q=60" },
-  { value: "rio", label: "Rio de Janeiro", country: "Brazil", region: "Americas", image: "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=60&q=60" },
+  { value: "nyc", label: "New York", country: "USA", region: "Americas", image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=400&q=80", lat: 40.7128, lng: -74.006 },
+  { value: "toronto", label: "Toronto", country: "Canada", region: "Americas", image: "https://images.unsplash.com/photo-1517090504586-fde19ea6066f?w=400&q=80", lat: 43.6532, lng: -79.3832 },
+  { value: "vancouver", label: "Vancouver", country: "Canada", region: "Americas", image: "https://images.unsplash.com/photo-1559511260-66a654ae982a?w=400&q=80", lat: 49.2827, lng: -123.1207 },
+  { value: "santiago", label: "Santiago", country: "Chile", region: "Americas", image: "https://images.unsplash.com/photo-1512909337583-04ae39f28014?w=400&q=80", lat: -33.4489, lng: -70.6693 },
+
   // Africa
-  { value: "cairo", label: "Cairo", country: "Egypt", region: "Africa", image: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=60&q=60" },
-  { value: "mauritius", label: "Mauritius", country: "Mauritius", region: "Africa", image: "https://images.unsplash.com/photo-1589197331516-4d84593eb64e?w=60&q=60" },
-  { value: "madagascar", label: "Madagascar", country: "Madagascar", region: "Africa", image: "https://images.unsplash.com/photo-1550252112-922650d0325b?w=60&q=60" },
-  { value: "cape_town", label: "Cape Town", country: "South Africa", region: "Africa", image: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=60&q=60" },
+  { value: "cairo", label: "Cairo", country: "Egypt", region: "Africa", image: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=400&q=80", lat: 30.0444, lng: 31.2357 },
+  { value: "mauritius", label: "Mauritius", country: "Mauritius", region: "Africa", image: "https://images.unsplash.com/photo-1589552820064-f20387437887?w=400&q=80", lat: -20.3484, lng: 57.5522 },
+  { value: "madagascar", label: "Madagascar", country: "Madagascar", region: "Africa", image: "https://images.unsplash.com/photo-1543862809-2c9e0bccd5f0?w=400&q=80", lat: -18.7669, lng: 46.8691 },
 ];
 
 /* ── Tier data ── */
@@ -493,18 +502,19 @@ const s: Record<string, React.CSSProperties> = {
 
 /* ── Custom Dropdown Component ── */
 function DestinationDropdown({
-  value,
+  values,
   onChange,
 }: {
-  value: string;
-  onChange: (val: string) => void;
+  values: string[];
+  onChange: (vals: string[]) => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
-  const selected = destinations.find((d) => d.value === value) || destinations[0];
+  const selectedItems = destinations.filter((d) => values.includes(d.value));
+  const displayItem = selectedItems[0] || destinations[0];
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -528,23 +538,67 @@ function DestinationDropdown({
 
   const regions = [...new Set(filtered.map((d) => d.region))];
 
+  const toggleValue = (val: string) => {
+    if (values.includes(val)) {
+      onChange(values.filter((v) => v !== val));
+    } else {
+      onChange([...values, val]);
+    }
+  };
+
   return (
     <div ref={containerRef} style={s.dropdownContainer}>
-      <button
+      <div
         style={{
           ...s.dropdownBtn,
           borderColor: isOpen ? "rgba(200, 165, 90, 0.4)" : "rgba(255, 255, 255, 0.08)",
+          flexWrap: "wrap",
+          gap: 8,
+          padding: values.length > 0 ? "12px 16px" : s.dropdownBtn.padding,
         }}
         onClick={() => setIsOpen(!isOpen)}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={selected.image} alt={selected.label} style={s.dropdownImage} />
-        <div style={s.dropdownText}>
-          <span style={s.dropdownCity}>{selected.label}</span>
-          <span style={s.dropdownCountry}>{selected.country}</span>
+        {values.length === 0 ? (
+          <>
+            <img src={destinations[0].image} alt="Select" style={s.dropdownImage} />
+            <div style={s.dropdownText}>
+              <span style={s.dropdownCity}>Select Destination(s)</span>
+              <span style={s.dropdownCountry}>Explore our global curated list</span>
+            </div>
+          </>
+        ) : (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, flex: 1 }}>
+            {selectedItems.map((item) => (
+              <div
+                key={item.value}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  background: "rgba(200, 165, 90, 0.1)",
+                  border: "1px solid rgba(200, 165, 90, 0.2)",
+                  padding: "4px 8px",
+                  borderRadius: 6,
+                  fontSize: 13,
+                  color: "white",
+                  backdropFilter: "blur(4px)",
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleValue(item.value);
+                }}
+              >
+                <img src={item.image} style={{ width: 16, height: 16, borderRadius: 2 }} alt="" />
+                {item.label}
+                <XIcon size={12} />
+              </div>
+            ))}
+          </div>
+        )}
+        <div style={{ marginLeft: "auto" }}>
+          <ChevronDown />
         </div>
-        <ChevronDown />
-      </button>
+      </div>
 
       <AnimatePresence>
         {isOpen && (
@@ -576,16 +630,12 @@ function DestinationDropdown({
                       style={{
                         ...s.dropdownOption,
                         background:
-                          d.value === value
+                          values.includes(d.value)
                             ? "rgba(200, 165, 90, 0.08)"
                             : "transparent",
                       }}
                       className="dropdown-option-hover"
-                      onClick={() => {
-                        onChange(d.value);
-                        setIsOpen(false);
-                        setSearch("");
-                      }}
+                      onClick={() => toggleValue(d.value)}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={d.image} alt={d.label} style={s.optionImage} />
@@ -593,7 +643,7 @@ function DestinationDropdown({
                         <span style={s.optionCity}>{d.label}</span>
                         <span style={s.optionCountry}>{d.country}</span>
                       </div>
-                      {d.value === value && (
+                      {values.includes(d.value) && (
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="2.5">
                           <polyline points="20 6 9 17 4 12" />
                         </svg>
@@ -611,8 +661,9 @@ function DestinationDropdown({
 
 /* ── Main Component ── */
 export default function BudgetSelector({ onPlanTrip }: BudgetSelectorProps) {
-  const [destination, setDestination] = useState("paris");
+  const [selectedDestinations, setSelectedDestinations] = useState<string[]>(["paris"]);
   const [days, setDays] = useState(5);
+  const [error, setError] = useState<string | null>(null);
   const [selections, setSelections] = useState<BudgetSelections>({
     stay: "mid",
     eat: "mid",
@@ -622,6 +673,57 @@ export default function BudgetSelector({ onPlanTrip }: BudgetSelectorProps) {
   const updateCategory = (cat: Category, tier: BudgetTier) => {
     setSelections((prev) => ({ ...prev, [cat]: tier }));
   };
+
+  const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const R = 6371; // km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
+  const validateRadius = (values: string[]) => {
+    if (values.length <= 1) return true;
+    const selDestData = destinations.filter((d) => values.includes(d.value));
+
+    // Check distance between all pairs
+    for (let i = 0; i < selDestData.length; i++) {
+      for (let j = i + 1; j < selDestData.length; j++) {
+        const dist = getDistance(
+          selDestData[i].lat,
+          selDestData[i].lng,
+          selDestData[j].lat,
+          selDestData[j].lng
+        );
+        if (dist > 3500) { // Max 3500km radius
+          return false;
+        }
+      }
+    }
+    return true;
+  };
+
+  const handleGenerate = () => {
+    if (selectedDestinations.length === 0) {
+      setError("Please select at least one destination.");
+      return;
+    }
+    if (!validateRadius(selectedDestinations)) {
+      setError("Destinations are too far apart. Please select countries within a similar region (e.g. SE Asia, Europe).");
+      return;
+    }
+    onPlanTrip(selectedDestinations, days, selections);
+  };
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   return (
     <section id="planner" style={s.section}>
@@ -637,9 +739,44 @@ export default function BudgetSelector({ onPlanTrip }: BudgetSelectorProps) {
           <p style={s.label}>Plan Your Journey</p>
           <h2 style={s.title}>Craft Your Perfect Trip</h2>
           <p style={s.subtitle}>
-            Choose your destination, set your duration, and mix budget tiers across categories.
+            Multi-select destinations within a region, set duration, and mix budget tiers.
           </p>
         </motion.div>
+
+        {/* Error Snackbar */}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: 20, x: "-50%" }}
+              animate={{ opacity: 1, y: 0, x: "-50%" }}
+              exit={{ opacity: 0, y: 10, x: "-50%" }}
+              style={{
+                position: "fixed",
+                bottom: 40,
+                left: "50%",
+                background: "#f43f5e",
+                color: "white",
+                padding: "14px 24px",
+                borderRadius: 12,
+                zIndex: 1000,
+                boxShadow: "0 12px 32px rgba(244, 63, 94, 0.3)",
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                fontWeight: 500,
+                fontSize: 14,
+                width: "90%",
+                maxWidth: 480,
+              }}
+            >
+              <AlertCircle />
+              <span style={{ flex: 1 }}>{error}</span>
+              <button onClick={() => setError(null)} style={{ background: "none", border: "none", color: "white", cursor: "pointer", padding: 4 }}>
+                <XIcon size={16} />
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Form */}
         <motion.div
@@ -652,8 +789,8 @@ export default function BudgetSelector({ onPlanTrip }: BudgetSelectorProps) {
           {/* Destination & Duration */}
           <div style={s.dropdownRow} className="budget-input-grid">
             <div>
-              <label style={s.fieldLabel}>Destination</label>
-              <DestinationDropdown value={destination} onChange={setDestination} />
+              <label style={s.fieldLabel}>Destinations (Multi-select)</label>
+              <DestinationDropdown values={selectedDestinations} onChange={setSelectedDestinations} />
             </div>
             <div>
               <label style={s.fieldLabel}>Duration (Days)</label>
@@ -760,7 +897,7 @@ export default function BudgetSelector({ onPlanTrip }: BudgetSelectorProps) {
             <Button
               variant="primary"
               size="lg"
-              onClick={() => onPlanTrip(destination, days, selections)}
+              onClick={handleGenerate}
               style={{ minWidth: 260 }}
             >
               Generate Itinerary

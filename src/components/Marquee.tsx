@@ -77,8 +77,10 @@ const marqueeStyles: Record<string, React.CSSProperties> = {
 
 export default function Marquee() {
   const [time, setTime] = useState(new Date());
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const timer = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
@@ -106,7 +108,7 @@ export default function Marquee() {
             <span key={i} style={marqueeStyles.item}>
               <span style={marqueeStyles.dot} />
               <span>{dest.label} · {dest.country}</span>
-              <span style={marqueeStyles.time}>{getLocalTime(dest.timezone)}</span>
+              <span style={marqueeStyles.time}>{mounted ? getLocalTime(dest.timezone) : "--:--"}</span>
             </span>
           ))}
         </div>
