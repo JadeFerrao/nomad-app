@@ -171,25 +171,23 @@ const heroStyles: Record<string, React.CSSProperties> = {
     animation: "logo-scroll 40s linear infinite",
   },
   logo: {
-    height: 24,
+    height: 35,
+    width: "auto",
+    maxWidth: 140,
     opacity: 0.4,
-    filter: "grayscale(1) invert(1)",
+    filter: "brightness(0) invert(1)",
     transition: "all 0.3s ease",
+    objectFit: "contain" as const,
   },
 };
 
 const trustedLogos = [
-  "/airasia.png",
-  "/airbnb.svg",
-  "/airfrance.svg",
-  "/skyscanner.png",
-  "/emirates.png",
-  "/expedia.svg",
-  "/kayak.svg",
-  "/klook.svg",
-  "/lufthansa.svg",
-  "/mmt.svg",
+  "/skyscanner.svg",
   "/tripadvisor.svg",
+  "/qatarairways.svg",
+  "/expedia.svg",
+  "/airbnb.svg",
+  "/makemytrip.svg",
 ];
 
 export default function HeroSection() {
@@ -304,12 +302,10 @@ export default function HeroSection() {
               alt="partner logo"
               style={heroStyles.logo}
               onMouseEnter={(e) => {
-                e.currentTarget.style.opacity = "0.8";
-                e.currentTarget.style.filter = "grayscale(0) invert(0)";
+                e.currentTarget.style.opacity = "1";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.opacity = "0.4";
-                e.currentTarget.style.filter = "grayscale(1) invert(1)";
               }}
             />
           ))}

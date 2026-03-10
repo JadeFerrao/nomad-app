@@ -126,8 +126,8 @@ Return ONLY pure JSON data.
   },
   "requirements": [
     "Requirement 1 (MUST be factual Visa information for Indian citizens visiting ${destString})",
-    "Requirement 2 (MUST be factual Visa information for Western/Foreign citizens visiting ${destString})",
-    
+    "Requirement 2 (MUST be factual Visa information for Western/Foreign citizens visiting ${destString})",   
+    "Requirement 3 (Travel Insurance recommended)",
     "Seasonal tip for traveling to ${destString} during ${dateRangeStr}"
   ],
   "days": [

@@ -812,12 +812,19 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
                 <input
                   type="date"
                   value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                  onChange={(e) => {
+                    setStartDate(e.target.value);
+                    if (new Date(e.target.value) > new Date(endDate)) {
+                      setEndDate(e.target.value);
+                    }
+                  }}
                   style={{ ...s.input, padding: '12px 10px', fontSize: '12px' }}
                 />
                 <input
                   type="date"
                   value={endDate}
+                  min={startDate}
                   onChange={(e) => setEndDate(e.target.value)}
                   style={{ ...s.input, padding: '12px 10px', fontSize: '12px' }}
                 />
