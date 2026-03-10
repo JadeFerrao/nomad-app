@@ -174,9 +174,7 @@ const heroStyles: Record<string, React.CSSProperties> = {
     height: 35,
     width: "auto",
     maxWidth: 140,
-    opacity: 0.4,
     filter: "brightness(0) invert(1)",
-    transition: "all 0.3s ease",
     objectFit: "contain" as const,
   },
 };
@@ -296,17 +294,21 @@ export default function HeroSection() {
         <span style={heroStyles.trustedLabel}>Trusted By</span>
         <div style={heroStyles.logoTrack}>
           {[...trustedLogos, ...trustedLogos, ...trustedLogos].map((logo, i) => (
-            <img
+            <motion.img
               key={i}
               src={logo}
               alt="partner logo"
-              style={heroStyles.logo}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.opacity = "1";
+              style={{
+                ...heroStyles.logo,
+                height: logo.includes("qatarairways") ? 70 : 35,
               }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.opacity = "0.4";
+              initial={{ opacity: 0.3, filter: "brightness(0) invert(1) grayscale(1)" }}
+              whileHover={{
+                opacity: 1,
+                filter: "brightness(0) invert(1) grayscale(0)",
+                scale: 1.05
               }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
             />
           ))}
         </div>
