@@ -102,6 +102,15 @@ const destinations: Destination[] = [
   { value: "paris", label: "Paris", country: "France", region: "Europe", image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400&q=80", lat: 48.8566, lng: 2.3522 },
   { value: "rome", label: "Rome", country: "Italy", region: "Europe", image: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=400&q=80", lat: 41.9028, lng: 12.4964 },
   { value: "london", label: "London", country: "UK", region: "Europe", image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&q=80", lat: 51.5074, lng: -0.1278 },
+  { value: "madrid", label: "Madrid", country: "Spain", region: "Europe", image: "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=400&q=80", lat: 40.4168, lng: -3.7038 },
+  { value: "lisbon", label: "Lisbon", country: "Portugal", region: "Europe", image: "https://images.unsplash.com/photo-1585211751442-7005a6435f60?w=400&q=80", lat: 38.7223, lng: -9.1393 },
+  { value: "athens", label: "Athens", country: "Greece", region: "Europe", image: "https://images.unsplash.com/photo-1503152397458-71e8615eeec2?w=400&q=80", lat: 37.9838, lng: 23.7275 },
+  { value: "sofia", label: "Sofia", country: "Bulgaria", region: "Europe", image: "https://images.unsplash.com/photo-1563721343048-032958428801?w=400&q=80", lat: 42.6977, lng: 23.3219 },
+  { value: "stockholm", label: "Stockholm", country: "Sweden", region: "Europe", image: "https://images.unsplash.com/photo-1509356843151-3e7d96241e11?w=400&q=80", lat: 59.3293, lng: 18.0686 },
+  { value: "helsinki", label: "Helsinki", country: "Finland", region: "Europe", image: "https://images.unsplash.com/photo-1517154421773-0529f29ea451?w=400&q=80", lat: 60.1699, lng: 24.9384 },
+  { value: "amsterdam", label: "Amsterdam", country: "Netherlands", region: "Europe", image: "https://images.unsplash.com/photo-1512470876302-972fad2aa9dd?w=400&q=80", lat: 52.3676, lng: 4.9041 },
+  { value: "belgrade", label: "Belgrade", country: "Serbia", region: "Europe", image: "https://images.unsplash.com/photo-1564531478709-7d84f88e4042?w=400&q=80", lat: 44.7866, lng: 20.4489 },
+  { value: "vienna", label: "Vienna", country: "Austria", region: "Europe", image: "https://images.unsplash.com/photo-1516550893923-42d28e5677af?w=400&q=80", lat: 48.2082, lng: 16.3738 },
   { value: "warsaw", label: "Warsaw", country: "Poland", region: "Europe", image: "https://images.unsplash.com/photo-1519197924294-4ba991a11128?w=400&q=80", lat: 52.2297, lng: 21.0122 },
   { value: "bratislava", label: "Bratislava", country: "Slovakia", region: "Europe", image: "https://images.unsplash.com/photo-1564344498308-f472ce1ce16d?w=400&q=80", lat: 48.1486, lng: 17.1077 },
   { value: "tbilisi", label: "Tbilisi", country: "Georgia", region: "Europe", image: "https://images.unsplash.com/photo-1518002171953-a080ee817e1f?w=400&q=80", lat: 41.7151, lng: 44.8271 },
@@ -112,6 +121,10 @@ const destinations: Destination[] = [
   // Asia
   { value: "tokyo", label: "Tokyo", country: "Japan", region: "Asia", image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&q=80", lat: 35.6762, lng: 139.6503 },
   { value: "mumbai", label: "Mumbai", country: "India", region: "Asia", image: "https://images.unsplash.com/photo-1566552881560-0be862a7c445?w=800&q=80", lat: 19.076, lng: 72.8777 },
+  { value: "bali", label: "Ubud", country: "Indonesia", region: "Asia", image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=400&q=80", lat: -8.5069, lng: 115.2625 },
+  { value: "dubai", label: "Dubai", country: "UAE", region: "Asia", image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400&q=80", lat: 25.2048, lng: 55.2708 },
+  { value: "phnom_penh", label: "Phnom Penh", country: "Cambodia", region: "Asia", image: "https://images.unsplash.com/photo-1528127269322-539801943592?w=400&q=80", lat: 11.5564, lng: 104.9282 },
+  { value: "cebu", label: "Cebu", country: "Philippines", region: "Asia", image: "https://images.unsplash.com/photo-1516690561799-46d8f74f9abf?w=400&q=80", lat: 10.3157, lng: 123.8854 },
   { value: "assam", label: "Assam", country: "India", region: "Asia", image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=800&q=80", lat: 26.2441, lng: 92.5378 },
   { value: "bhutan", label: "Thimphu", country: "Bhutan", region: "Asia", image: "https://images.unsplash.com/photo-1578516125863-30fec1761921?w=400&q=80", lat: 27.4728, lng: 89.6339 },
   { value: "maldives", label: "Malé", country: "Maldives", region: "Asia", image: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80", lat: 4.1755, lng: 73.5093 },
@@ -126,12 +139,17 @@ const destinations: Destination[] = [
   { value: "yerevan", label: "Yerevan", country: "Armenia", region: "Asia", image: "https://images.unsplash.com/photo-1563841930606-67e2b64dadad?w=400&q=80", lat: 40.1772, lng: 44.5035 },
 
   // Americas
+  { value: "mexico_city", label: "Mexico City", country: "Mexico", region: "Americas", image: "https://images.unsplash.com/photo-1518105779142-d975f22f1b0a?w=400&q=80", lat: 19.4326, lng: -99.1332 },
+  { value: "tegucigalpa", label: "Tegucigalpa", country: "Honduras", region: "Americas", image: "https://images.unsplash.com/photo-1579489225078-2287f917456a?w=400&q=80", lat: 14.0723, lng: -87.1921 },
+  { value: "san_jose", label: "San Jose", country: "Costa Rica", region: "Americas", image: "https://images.unsplash.com/photo-1590453535265-27a3a830026e?w=400&q=80", lat: 9.9281, lng: -84.0907 },
+  { value: "lima", label: "Lima", country: "Peru", region: "Americas", image: "https://images.unsplash.com/photo-1531968455001-5c5277a9b133?w=400&q=80", lat: -12.0464, lng: -77.0428 },
   { value: "nyc", label: "New York", country: "USA", region: "Americas", image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=400&q=80", lat: 40.7128, lng: -74.006 },
   { value: "toronto", label: "Toronto", country: "Canada", region: "Americas", image: "https://images.unsplash.com/photo-1517090504586-fde19ea6066f?w=400&q=80", lat: 43.6532, lng: -79.3832 },
   { value: "vancouver", label: "Vancouver", country: "Canada", region: "Americas", image: "https://images.unsplash.com/photo-1559511260-66a654ae982a?w=400&q=80", lat: 49.2827, lng: -123.1207 },
   { value: "santiago", label: "Santiago", country: "Chile", region: "Americas", image: "https://images.unsplash.com/photo-1512909337583-04ae39f28014?w=400&q=80", lat: -33.4489, lng: -70.6693 },
 
   // Africa
+  { value: "daressalaam", label: "Dar es Salaam", country: "Tanzania", region: "Africa", image: "https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?w=400&q=80", lat: -6.7924, lng: 39.2083 },
   { value: "cairo", label: "Cairo", country: "Egypt", region: "Africa", image: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=400&q=80", lat: 30.0444, lng: 31.2357 },
   { value: "mauritius", label: "Mauritius", country: "Mauritius", region: "Africa", image: "https://images.unsplash.com/photo-1589552820064-f20387437887?w=400&q=80", lat: -20.3484, lng: 57.5522 },
   { value: "madagascar", label: "Madagascar", country: "Madagascar", region: "Africa", image: "https://images.unsplash.com/photo-1543862809-2c9e0bccd5f0?w=400&q=80", lat: -18.7669, lng: 46.8691 },
@@ -860,6 +878,11 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
                 <option value="AUD">AUD ($)</option>
                 <option value="CAD">CAD ($)</option>
                 <option value="SGD">SGD ($)</option>
+                <option value="AED">AED (د.إ)</option>
+                <option value="CHF">CHF (Fr.)</option>
+                <option value="MXN">MXN ($)</option>
+                <option value="SEK">SEK (kr)</option>
+                <option value="ZAR">ZAR (R)</option>
               </select>
             </div>
           </div>
@@ -985,7 +1008,7 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
         }
         @media (min-width: 769px) {
           .budget-input-grid {
-            grid-template-columns: 2fr 1.5fr !important;
+            grid-template-columns: 1fr 1fr !important;
           }
         }
         .dropdown-option-hover:hover {

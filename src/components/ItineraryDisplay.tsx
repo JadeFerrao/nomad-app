@@ -708,8 +708,468 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
     }
   }, [aiItinerary]);
 
-  const handleDownloadPDF = () => {
-    window.print();
+  const handleDownloadPDF = async () => {
+    try {
+      // Dynamic import to avoid SSR issues
+      const jsPDF = (await import('jspdf')).default;
+      const html2canvas = (await import('html2canvas')).default;
+
+      // Create a temporary container with the itinerary content
+      const tempContainer = document.createElement('div');
+      tempContainer.style.position = 'absolute';
+      tempContainer.style.left = '-9999px';
+      tempContainer.style.top = '0';
+      tempContainer.style.width = '800px';
+      tempContainer.style.background = '#fff';
+      tempContainer.style.padding = '40px';
+      tempContainer.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      tempContainer.style.color = '#111';
+      tempContainer.style.lineHeight = '1.6';
+
+      // Build the content
+      tempContainer.innerHTML = `
+        <div style="max-width: 720px;">
+          <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 8px; color: #111;">
+            Trip to ${data.name}
+          </h2>
+          <p style="font-size: 16px; color: #666; margin-bottom: 32px;">
+            ${displayDays.length} Days Itinerary — Curated just for you
+          </p>
+          
+          <div style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 12px; padding: 24px; margin-bottom: 40px;">
+            <div style="margin-bottom: 24px;">
+              <span style="font-size: 14px; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">
+                Total Estimated Budget (Incl. Flights)
+              </span>
+              <div style="font-size: 28px; font-weight: 700; color: #111; margin-bottom: 16px;">
+                ${data.total_budget || "Calculated on request"}
+              </div>
+              
+              <div style="background: #fff; border: 1px solid #e9ecef; border-radius: 8px; padding: 16px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                  <span>Approx Flights (${people} Flyers)</span>
+                  <span style="color: #c8a55a; font-weight: 600;">${data.approx_flight_budget || "—"}</span>
+                </div>
+                <p style="font-size: 12px; color: #666; font-style: italic;">
+                  *Flight prices are indicative and vary by airline.
+                </p>
+              </div>
+              
+              <p style="font-size: 12px; color: #666; margin-top: 16px;">
+                *Estimated based on your selected "${tierLabels[selections.stay]}" stay and transportation.
+              </p>
+            </div>
+            
+            <div>
+              <span style="font-size: 14px; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">
+                Travel Essentials
+              </span>
+              <ul style="list-style: none; padding: 0;">
+                ${(data.requirements || ["Check your local visa entry requirements", "Travel insurance is highly recommended", "Currency exchange available at city center"]).map((req: string) => 
+                  `<li style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; font-size: 14px; color: #444;">
+                    <span style="color: #28a745; font-weight: bold;">✓</span>
+                    ${req}
+                  </li>`
+                ).join('')}
+              </ul>
+            </div>
+          </div>
+          
+          ${displayDays.map((day: any, i: number) => `
+            <div style="margin-bottom: 40px; page-break-inside: avoid;">
+              <div style="margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #e9ecef;">
+                <span style="font-size: 18px; font-weight: 700; color: #c8a55a; margin-right: 12px;">Day ${i + 1}</span>
+                <span style="font-size: 20px; font-weight: 600; color: #111;">${day.title}</span>
+              </div>
+              
+              ${day.description ? `<p style="font-size: 14px; color: #666; margin-bottom: 20px; line-height: 1.6;">${day.description}</p>` : ''}
+              
+              <div style="display: flex; flex-direction: column; gap: 16px;">
+                ${categories.map((cat) => {
+                  const tier = selections[cat];
+                  const item = day[cat][tier];
+                  const categoryColors = {
+                    stay: '#28a745',
+                    eat: '#fd7e14', 
+                    explore: '#6f42c1'
+                  };
+                  
+                  return `
+                    <div style="display: flex; background: #fff; border: 1px solid #e9ecef; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                      <div style="width: 80px; height: 80px; background: #f0f0f0; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #666;">
+                        IMG
+                      </div>
+                      <div style="padding: 16px; flex: 1;">
+                        <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; color: ${categoryColors[cat]};">
+                          ${categoryLabels[cat]}
+                        </div>
+                        <div style="font-size: 16px; font-weight: 600; color: #111; margin-bottom: 4px;">
+                          ${item.name}
+                        </div>
+                        <div style="font-size: 14px; font-weight: 600; color: #c8a55a;">
+                          ${item.price}
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      document.body.appendChild(tempContainer);
+
+      // Convert to canvas
+      const canvas = await html2canvas(tempContainer, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        width: 800,
+        height: tempContainer.scrollHeight
+      });
+
+      // Remove temporary container
+      document.body.removeChild(tempContainer);
+
+      // Create PDF
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = pdfWidth - 20; // 10mm margin on each side
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      let heightLeft = imgHeight;
+      let position = 10; // 10mm top margin
+
+      // Add first page
+      pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+      heightLeft -= (pdfHeight - 20); // Account for margins
+
+      // Add additional pages if needed
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight + 10;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+        heightLeft -= (pdfHeight - 20);
+      }
+
+      // Download the PDF
+      const fileName = `${data.name.replace(/[^a-zA-Z0-9]/g, '-')}-${displayDays.length}-Days-Itinerary.pdf`;
+      pdf.save(fileName);
+
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      // Fallback to print dialog
+      window.print();
+    }
+    // Create a new window with only the itinerary content
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    // Get the itinerary content
+    const itineraryElement = document.getElementById('itinerary');
+    if (!itineraryElement) return;
+
+    // Create the print document
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Trip to ${data.name} - ${displayDays.length} Days Itinerary</title>
+          <style>
+            * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+            }
+            
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+              line-height: 1.6;
+              color: #111;
+              background: #fff;
+              padding: 40px;
+              max-width: 800px;
+              margin: 0 auto;
+            }
+            
+            .no-print, button, .mix-badges-container {
+              display: none !important;
+            }
+            
+            h2 {
+              font-size: 32px;
+              font-weight: 700;
+              margin-bottom: 8px;
+              color: #111;
+            }
+            
+            .header-sub {
+              font-size: 16px;
+              color: #666;
+              margin-bottom: 32px;
+            }
+            
+            .summary-card {
+              background: #f8f9fa;
+              border: 1px solid #e9ecef;
+              border-radius: 12px;
+              padding: 24px;
+              margin-bottom: 40px;
+              display: flex;
+              gap: 32px;
+            }
+            
+            .summary-section {
+              flex: 1;
+            }
+            
+            .summary-label {
+              font-size: 14px;
+              font-weight: 600;
+              color: #666;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              margin-bottom: 8px;
+              display: block;
+            }
+            
+            .total-price {
+              font-size: 28px;
+              font-weight: 700;
+              color: #111;
+              margin-bottom: 16px;
+            }
+            
+            .flight-info {
+              background: #fff;
+              border: 1px solid #e9ecef;
+              border-radius: 8px;
+              padding: 16px;
+              margin-top: 16px;
+            }
+            
+            .flight-row {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 8px;
+            }
+            
+            .flight-note {
+              font-size: 12px;
+              color: #666;
+              font-style: italic;
+            }
+            
+            .req-list {
+              list-style: none;
+            }
+            
+            .req-item {
+              display: flex;
+              align-items: flex-start;
+              gap: 12px;
+              margin-bottom: 12px;
+              font-size: 14px;
+              color: #444;
+            }
+            
+            .req-item::before {
+              content: "✓";
+              color: #28a745;
+              font-weight: bold;
+              flex-shrink: 0;
+            }
+            
+            .day-card {
+              margin-bottom: 40px;
+              page-break-inside: avoid;
+              break-inside: avoid;
+            }
+            
+            .day-header {
+              margin-bottom: 16px;
+              padding-bottom: 12px;
+              border-bottom: 2px solid #e9ecef;
+            }
+            
+            .day-number {
+              font-size: 18px;
+              font-weight: 700;
+              color: #c8a55a;
+              margin-right: 12px;
+            }
+            
+            .day-title {
+              font-size: 20px;
+              font-weight: 600;
+              color: #111;
+            }
+            
+            .day-description {
+              font-size: 14px;
+              color: #666;
+              margin-bottom: 20px;
+              line-height: 1.6;
+            }
+            
+            .day-items {
+              display: flex;
+              flex-direction: column;
+              gap: 16px;
+            }
+            
+            .item-card {
+              display: flex;
+              background: #fff;
+              border: 1px solid #e9ecef;
+              border-radius: 8px;
+              overflow: hidden;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            
+            .item-image {
+              width: 80px;
+              height: 80px;
+              object-fit: cover;
+              flex-shrink: 0;
+            }
+            
+            .item-info {
+              padding: 16px;
+              flex: 1;
+            }
+            
+            .item-category {
+              font-size: 12px;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              margin-bottom: 4px;
+            }
+            
+            .item-category.stay { color: #28a745; }
+            .item-category.eat { color: #fd7e14; }
+            .item-category.explore { color: #6f42c1; }
+            
+            .item-name {
+              font-size: 16px;
+              font-weight: 600;
+              color: #111;
+              margin-bottom: 4px;
+            }
+            
+            .item-price {
+              font-size: 14px;
+              font-weight: 600;
+              color: #c8a55a;
+            }
+            
+            @media print {
+              body { padding: 20px; }
+              .day-card { page-break-inside: avoid; }
+            }
+          </style>
+        </head>
+        <body>
+    `);
+
+    // Add the content
+    printWindow.document.write(`
+      <div>
+        <h2>Trip to ${data.name}</h2>
+        <p class="header-sub">${displayDays.length} Days Itinerary — Curated just for you</p>
+        
+        <div class="summary-card">
+          <div class="summary-section">
+            <span class="summary-label">Total Estimated Budget (Incl. Flights)</span>
+            <div class="total-price">${data.total_budget || "Calculated on request"}</div>
+            
+            <div class="flight-info">
+              <div class="flight-row">
+                <span>Approx Flights (${people} Flyers)</span>
+                <span style="color: #c8a55a; font-weight: 600;">${data.approx_flight_budget || "—"}</span>
+              </div>
+              <p class="flight-note">*Flight prices are indicative and vary by airline.</p>
+            </div>
+            
+            <p style="font-size: 12px; color: #666; margin-top: 16px;">
+              *Estimated based on your selected "${tierLabels[selections.stay]}" stay and transportation.
+            </p>
+          </div>
+          
+          <div class="summary-section">
+            <span class="summary-label">Travel Essentials</span>
+            <ul class="req-list">
+              ${(data.requirements || ["Check your local visa entry requirements", "Travel insurance is highly recommended", "Currency exchange available at city center"]).map((req: string) => 
+                `<li class="req-item">${req}</li>`
+              ).join('')}
+            </ul>
+          </div>
+        </div>
+    `);
+
+    // Add each day
+    displayDays.forEach((day: any, i: number) => {
+      printWindow.document.write(`
+        <div class="day-card">
+          <div class="day-header">
+            <span class="day-number">Day ${i + 1}</span>
+            <span class="day-title">${day.title}</span>
+          </div>
+          
+          ${day.description ? `<p class="day-description">${day.description}</p>` : ''}
+          
+          <div class="day-items">
+      `);
+
+      categories.forEach((cat) => {
+        const tier = selections[cat];
+        const item = day[cat][tier];
+        const categoryColors = {
+          stay: '#28a745',
+          eat: '#fd7e14', 
+          explore: '#6f42c1'
+        };
+        
+        printWindow.document.write(`
+          <div class="item-card">
+            <img src="${item.image}" alt="${item.name}" class="item-image" />
+            <div class="item-info">
+              <div class="item-category ${cat}" style="color: ${categoryColors[cat]}">
+                ${categoryLabels[cat]}
+              </div>
+              <div class="item-name">${item.name}</div>
+              <div class="item-price">${item.price}</div>
+            </div>
+          </div>
+        `);
+      });
+
+      printWindow.document.write(`
+          </div>
+        </div>
+      `);
+    });
+
+    printWindow.document.write(`
+        </div>
+      </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    
+    // Wait for images to load, then print
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 1000);
   };
 
 
@@ -807,43 +1267,45 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
               }}>Nomad Verified</span>
             </div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 'var(--space-8)', marginBottom: 'var(--space-2)' }}>
-            <h2 style={{ ...st.headerTitle, marginBottom: 0 }}>
-              {data.name}
-            </h2>
-            <button
-              onClick={handleDownloadPDF}
-              className="no-print"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '8px 16px',
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '8px',
-                color: 'var(--color-white)',
-                fontSize: '13px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                fontFamily: 'var(--font-sans)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
-                e.currentTarget.style.borderColor = 'var(--color-accent)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-              }}
-            >
-              <DownloadIcon />
-              Download as PDF
-            </button>
-          </div>
+          <h2 style={st.headerTitle}>
+            {data.name}
+          </h2>
 
           <p style={st.headerSub}>{displayDays.length} Days Itinerary — Curated just for you</p>
+
+          <button
+            onClick={handleDownloadPDF}
+            className="no-print"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              marginTop: 'var(--space-6)',
+              padding: '10px 20px',
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '8px',
+              color: 'var(--color-white)',
+              fontSize: '14px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              fontFamily: 'var(--font-sans)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+              e.currentTarget.style.borderColor = 'var(--color-accent)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            <DownloadIcon />
+            Download as PDF
+          </button>
 
           {/* Mix badges */}
           <div style={st.mixBadges} className="mix-badges-container">
@@ -886,34 +1348,32 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
                 *Flight prices are indicative and vary by airline.
               </p>
 
-              {data.booking_links?.skyscanner && (
-                <a
-                  href={data.booking_links.skyscanner}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    marginTop: 'var(--space-4)',
-                    padding: '10px',
-                    background: '#00d7f1', // Skyscanner cyan
-                    color: '#000',
-                    borderRadius: '8px',
-                    textDecoration: 'none',
-                    fontFamily: 'var(--font-sans)',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    transition: 'all 0.2s ease'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.filter = 'brightness(1.1)'}
-                  onMouseLeave={(e) => e.currentTarget.style.filter = 'none'}
-                >
-                  <img src="/skyscanner.png" alt="Skyscanner" style={{ height: 16 }} />
-                  Compare Flights on Skyscanner
-                </a>
-              )}
+              <a
+                href="https://www.skyscanner.net/"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  marginTop: 'var(--space-4)',
+                  padding: '10px',
+                  background: '#0b8af9ff', // Skyscanner cyan
+                  color: '#000',
+                  borderRadius: '8px',
+                  textDecoration: 'none',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.filter = 'brightness(1.1)'}
+                onMouseLeave={(e) => e.currentTarget.style.filter = 'none'}
+              >
+                <img src="/skyscanner.svg" alt="Skyscanner" style={{ height: 16 }} />
+                {/* Compare Flights on Skyscanner */}
+              </a>
             </div>
 
             <p style={{ color: 'var(--color-ash)', fontSize: '12px', marginTop: 'var(--space-4)', fontFamily: 'var(--font-sans)' }}>
@@ -1012,6 +1472,9 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
                         alt={item.name}
                         style={st.itemImage}
                         loading="lazy"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&q=80';
+                        }}
                       />
                       <div style={st.itemInfo}>
                         <div style={st.itemCategoryRow}>

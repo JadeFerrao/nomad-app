@@ -250,7 +250,7 @@ export default function HeroSection() {
                 <span style={heroStyles.statLabel}>Trips Planned</span>
               </div>
               <div style={heroStyles.stat}>
-                <span style={heroStyles.statNumber}>4.9</span>
+                <span style={heroStyles.statNumber}>4.3</span>
                 <span style={heroStyles.statLabel}>User Rating</span>
               </div>
             </div>

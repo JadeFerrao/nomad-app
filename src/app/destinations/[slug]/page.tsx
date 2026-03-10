@@ -198,9 +198,9 @@ export default function DestinationArticle() {
                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(10,10,10,1) 20%, rgba(10,10,10,0.4) 60%, transparent 100%)" }} />
                  <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "var(--space-10)", zIndex: 10 }}>
                    <div style={{ display: "grid", gap: "var(--space-8)" }} className="stay-grid">
-                     <div style={{ display: "flex", alignItems: "flex-start", gap: "var(--space-3)" }}>
+                     <div style={{ display: "flex", alignItems: "flex-start", gap: "var(--space-3)", marginBottom: "var(--space-4)" }}>
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="1.5" style={{ marginTop: "4px" }}><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><path d="M9 22V12h6v10" /></svg>
-                        <h4 style={{ fontFamily: "var(--font-serif)", fontSize: "var(--text-3xl)", color: "var(--color-white)", lineHeight: 1.15 }}>Where<br/>to Stay</h4>
+                        <h4 style={{ fontFamily: "var(--font-serif)", fontSize: "var(--text-2xl)", color: "var(--color-white)", lineHeight: 1.15 }}>Where to Stay</h4>
                      </div>
                      <p style={{ fontFamily: "var(--font-sans)", fontSize: "var(--text-lg)", color: "var(--color-cloud)", margin: 0, fontWeight: 300, lineHeight: 1.6 }}>
                         {dest.stay || "Uncover the most authentic boutique hotels and unique stays vetted by our curators. Perfect for immersing yourself completely into the destination's vibe."}
