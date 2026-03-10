@@ -121,9 +121,13 @@ Return ONLY pure JSON data.
   "name": "Trip to ${destString}",
   "total_budget": "Total estimated budget INCLUDING flight for all ${people} people in ${currency} (include symbol e.g. ₹5,25,000)",
   "approx_flight_budget": "Approx total flight ticket cost for ${people} people in ${currency}",
+  "booking_links": {
+    "skyscanner": "Direct Skyscanner search URL for this route and dates: https://www.skyscanner.net/transport/flights/[origin]/[destination]/[outboundDate]/[inboundDate]?adults=${people}"
+  },
   "requirements": [
-    "Requirement 1 (e.g. Visa needed for Indian citizens)",
-    "Requirement 2 (e.g. Travel Insurance recommended)",
+    "Requirement 1 (MUST be factual Visa information for Indian citizens visiting ${destString})",
+    "Requirement 2 (MUST be factual Visa information for Western/Foreign citizens visiting ${destString})",
+    
     "Seasonal tip for traveling to ${destString} during ${dateRangeStr}"
   ],
   "days": [
@@ -148,6 +152,11 @@ Return ONLY pure JSON data.
     }
   ]
 }
+
+CRITICAL: Return exactly ${days} days in the "days" array to match the selected duration.
+CRITICAL: Use ONLY factual, up-to-date visa information. If a country is Visa-free or VOA, state it explicitly for both Indian and Foreign citizens.
+CRITICAL: Construct the Skyscanner URL using the actual dates: Outbound: ${startDate}, Inbound: ${endDate}.
+
 
 Make sure there are exactly ${days} items in the "days" array. Avoid generic names, use real places.
 `;
@@ -220,6 +229,8 @@ Make sure there are exactly ${days} items in the "days" array. Avoid generic nam
     return new Response(JSON.stringify({
       name: parsedContent.name,
       total_budget: parsedContent.total_budget,
+      approx_flight_budget: parsedContent.approx_flight_budget,
+      booking_links: parsedContent.booking_links,
       requirements: parsedContent.requirements,
       days: processedDays
     }), {

@@ -38,15 +38,15 @@ export default function Home() {
     setIsLoading(true);
     setTripData(null);
     setItinerary(null);
-    
+
     try {
       setCurrency(selectedCurrency);
       const { data, error } = await supabase.functions.invoke("generate-itinerary", {
         body: { destinations, days, selections, currency: selectedCurrency, people, startDate, endDate },
       });
-      
+
       if (error) throw error;
-      
+
       setTripData({ destinations, days, selections, people, startDate, endDate });
       setItinerary(data);
 

@@ -144,32 +144,53 @@ const heroStyles: Record<string, React.CSSProperties> = {
     background: "radial-gradient(circle, rgba(200,165,90,0.06) 0%, transparent 70%)",
     pointerEvents: "none" as const,
   },
-  scrollIndicator: {
-    position: "absolute" as const,
-    bottom: "var(--space-8)",
-    left: "50%",
-    transform: "translateX(-50%)",
-    display: "flex",
-    flexDirection: "column" as const,
-    alignItems: "center",
-    gap: "var(--space-2)",
-    zIndex: 10,
+  trustedBy: {
+    position: "relative",
+    padding: "var(--space-8) 0",
+    borderTop: "1px solid rgba(255, 255, 255, 0.05)",
+    borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+    background: "rgba(255, 255, 255, 0.02)",
+    overflow: "hidden",
   },
-  scrollText: {
+  trustedLabel: {
     fontFamily: "var(--font-sans)",
-    fontSize: "var(--text-xs)",
-    fontWeight: 400,
-    color: "var(--color-silver)",
-    letterSpacing: "0.1em",
+    fontSize: "10px",
+    fontWeight: 600,
+    color: "var(--color-ash)",
     textTransform: "uppercase" as const,
+    letterSpacing: "0.2em",
+    textAlign: "center" as const,
+    marginBottom: "var(--space-6)",
+    display: "block",
   },
-  scrollLine: {
-    width: 1,
-    height: 40,
-    background: "linear-gradient(180deg, var(--color-accent), transparent)",
-    animation: "pulse-glow 2s ease-in-out infinite",
+  logoTrack: {
+    display: "flex",
+    alignItems: "center",
+    gap: "var(--space-12)",
+    width: "max-content",
+    animation: "logo-scroll 40s linear infinite",
+  },
+  logo: {
+    height: 24,
+    opacity: 0.4,
+    filter: "grayscale(1) invert(1)",
+    transition: "all 0.3s ease",
   },
 };
+
+const trustedLogos = [
+  "/airasia.png",
+  "/airbnb.svg",
+  "/airfrance.svg",
+  "/skyscanner.png",
+  "/emirates.png",
+  "/expedia.svg",
+  "/kayak.svg",
+  "/klook.svg",
+  "/lufthansa.svg",
+  "/mmt.svg",
+  "/tripadvisor.svg",
+];
 
 export default function HeroSection() {
   const scrollToPlanner = () => {
@@ -178,104 +199,122 @@ export default function HeroSection() {
   };
 
   return (
-    <section id="hero" style={heroStyles.section}>
-      <div style={heroStyles.bgImage} />
-      <div style={heroStyles.bgGradient} />
-      <div style={heroStyles.spotlightWrap}>
-        <Spotlight fill="rgba(200, 165, 90, 0.06)" />
-      </div>
+    <>
+      <section id="hero" style={heroStyles.section}>
+        <div style={heroStyles.bgImage} />
+        <div style={heroStyles.bgGradient} />
+        <div style={heroStyles.spotlightWrap}>
+          <Spotlight fill="rgba(200, 165, 90, 0.06)" />
+        </div>
 
-      <div style={heroStyles.container} className="hero-grid">
-        <motion.div
-          style={heroStyles.textContent}
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <div style={heroStyles.label}>
-            <span style={heroStyles.labelDot} />
-            <span>Curated Travel Experiences</span>
-          </div>
+        <div style={heroStyles.container} className="hero-grid">
+          <motion.div
+            style={heroStyles.textContent}
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <div style={heroStyles.label}>
+              <span style={heroStyles.labelDot} />
+              <span>Curated Travel Experiences</span>
+            </div>
 
-          <h1 style={heroStyles.heading}>
-            Travel
-            <br />
-            <span style={heroStyles.headingAccent}>Reimagined.</span>
-          </h1>
+            <h1 style={heroStyles.heading}>
+              Travel
+              <br />
+              <span style={heroStyles.headingAccent}>Reimagined.</span>
+            </h1>
 
-          <p style={heroStyles.subtext}>
-            Craft your perfect journey with intelligently curated itineraries.
-            Mix luxury stays with street food adventures — travel your way.
-          </p>
+            <p style={heroStyles.subtext}>
+              Craft your perfect journey with intelligently curated itineraries.
+              Mix luxury stays with street food adventures — travel your way.
+            </p>
 
-          <div style={heroStyles.actions}>
-            <Button variant="primary" size="lg" onClick={scrollToPlanner}>
-              Start Planning
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </Button>
-            <Link href="/destinations" style={{ textDecoration: 'none' }}>
-              <Button variant="secondary" size="lg">
-                Explore Destinations
+            <div style={heroStyles.actions}>
+              <Button variant="primary" size="lg" onClick={scrollToPlanner}>
+                Start Planning
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
               </Button>
-            </Link>
-          </div>
+              <Link href="/destinations" style={{ textDecoration: 'none' }}>
+                <Button variant="secondary" size="lg">
+                  Explore Destinations
+                </Button>
+              </Link>
+            </div>
 
-          <div style={heroStyles.statsRow} className="hero-stats">
-            <div style={heroStyles.stat}>
-              <span style={heroStyles.statNumber}>150+</span>
-              <span style={heroStyles.statLabel}>Destinations</span>
+            <div style={heroStyles.statsRow} className="hero-stats">
+              <div style={heroStyles.stat}>
+                <span style={heroStyles.statNumber}>150+</span>
+                <span style={heroStyles.statLabel}>Destinations</span>
+              </div>
+              <div style={heroStyles.stat}>
+                <span style={heroStyles.statNumber}>50k+</span>
+                <span style={heroStyles.statLabel}>Trips Planned</span>
+              </div>
+              <div style={heroStyles.stat}>
+                <span style={heroStyles.statNumber}>4.9</span>
+                <span style={heroStyles.statLabel}>User Rating</span>
+              </div>
             </div>
-            <div style={heroStyles.stat}>
-              <span style={heroStyles.statNumber}>50k+</span>
-              <span style={heroStyles.statLabel}>Trips Planned</span>
-            </div>
-            <div style={heroStyles.stat}>
-              <span style={heroStyles.statNumber}>4.9</span>
-              <span style={heroStyles.statLabel}>User Rating</span>
-            </div>
-          </div>
-        </motion.div>
+          </motion.div>
 
-        {/* Interactive Globe — desktop only */}
-        <motion.div
-          style={heroStyles.globeWrap}
-          className="hero-globe"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <div style={heroStyles.globeGlow} />
-          <Globe />
-        </motion.div>
+          {/* Interactive Globe — desktop only */}
+          <motion.div
+            style={heroStyles.globeWrap}
+            className="hero-globe"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <div style={heroStyles.globeGlow} />
+            <Globe />
+          </motion.div>
+        </div>
+
+        <style jsx global>{`
+          @media (min-width: 1024px) {
+            .hero-grid {
+              grid-template-columns: 1fr 1fr !important;
+            }
+            .hero-globe {
+              display: flex !important;
+            }
+          }
+          @media (max-width: 600px) {
+            .hero-stats {
+              gap: var(--space-6) !important;
+            }
+          }
+          @keyframes logo-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-33.33%); }
+          }
+        `}</style>
+      </section>
+
+      <div style={heroStyles.trustedBy}>
+        <span style={heroStyles.trustedLabel}>Trusted By</span>
+        <div style={heroStyles.logoTrack}>
+          {[...trustedLogos, ...trustedLogos, ...trustedLogos].map((logo, i) => (
+            <img
+              key={i}
+              src={logo}
+              alt="partner logo"
+              style={heroStyles.logo}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.opacity = "0.8";
+                e.currentTarget.style.filter = "grayscale(0) invert(0)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = "0.4";
+                e.currentTarget.style.filter = "grayscale(1) invert(1)";
+              }}
+            />
+          ))}
+        </div>
       </div>
-
-      <motion.div
-        style={heroStyles.scrollIndicator}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 0.6 }}
-      >
-        <span style={heroStyles.scrollText}>Scroll</span>
-        <div style={heroStyles.scrollLine} />
-      </motion.div>
-
-      <style jsx global>{`
-        @media (min-width: 1024px) {
-          .hero-grid {
-            grid-template-columns: 1fr 1fr !important;
-          }
-          .hero-globe {
-            display: flex !important;
-          }
-        }
-        @media (max-width: 600px) {
-          .hero-stats {
-            gap: var(--space-6) !important;
-          }
-        }
-      `}</style>
-    </section>
+    </>
   );
 }

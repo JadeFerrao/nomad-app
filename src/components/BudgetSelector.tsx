@@ -808,7 +808,7 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
             {/* Block 2: Dates */}
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <label style={s.fieldLabel}>Travel Dates (DD/MM/YYYY)</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-2)' }}>
+              <div className="date-input-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-2)' }}>
                 <input
                   type="date"
                   value={startDate}
@@ -894,7 +894,7 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
                   <span style={s.catLabel}>{categoryInfo[cat].label}</span>
                 </div>
 
-                <div style={s.tierGrid}>
+                <div style={s.tierGrid} className="tier-grid">
                   {(Object.keys(tierInfo) as BudgetTier[]).map((tier) => {
                     const isActive = active === tier;
                     const info = tierInfo[tier];
@@ -965,9 +965,20 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
       </div>
 
       <style jsx global>{`
-        @media (min-width: 640px) {
+        @media (max-width: 768px) {
           .budget-input-grid {
-            grid-template-columns: 2fr 1fr !important;
+            grid-template-columns: 1fr !important;
+          }
+          .tier-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .date-input-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+        @media (min-width: 769px) {
+          .budget-input-grid {
+            grid-template-columns: 2fr 1.5fr !important;
           }
         }
         .dropdown-option-hover:hover {

@@ -885,6 +885,35 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
               <p style={{ color: 'var(--color-ash)', fontSize: '11px', marginTop: '4px', fontFamily: 'var(--font-sans)', fontStyle: 'italic' }}>
                 *Flight prices are indicative and vary by airline.
               </p>
+
+              {data.booking_links?.skyscanner && (
+                <a
+                  href={data.booking_links.skyscanner}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    marginTop: 'var(--space-4)',
+                    padding: '10px',
+                    background: '#00d7f1', // Skyscanner cyan
+                    color: '#000',
+                    borderRadius: '8px',
+                    textDecoration: 'none',
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.filter = 'brightness(1.1)'}
+                  onMouseLeave={(e) => e.currentTarget.style.filter = 'none'}
+                >
+                  <img src="/skyscanner.png" alt="Skyscanner" style={{ height: 16 }} />
+                  Compare Flights on Skyscanner
+                </a>
+              )}
             </div>
 
             <p style={{ color: 'var(--color-ash)', fontSize: '12px', marginTop: 'var(--space-4)', fontFamily: 'var(--font-sans)' }}>
@@ -892,8 +921,12 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
             </p>
           </div>
 
-          <div>
-            <span style={st.summaryLabel}>Travel Requirements & Tips</span>
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)' }}>
+              <span style={st.summaryLabel}>Travel Essentials</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', opacity: 0.8 }}>
+              </div>
+            </div>
             <ul style={st.reqList}>
               {(data.requirements || ["Check your local visa entry requirements", "Travel insurance is highly recommended", "Currency exchange available at city center"]).map((req: string, idx: number) => (
                 <li key={idx} style={st.reqItem}>
@@ -931,9 +964,11 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
               </div>
 
               {/* Day header */}
-              <div style={st.dayHeader}>
-                <span style={st.dayNumber}>Day {i + 1}</span>
-                <span style={st.dayTitle}>{day.title}</span>
+              <div style={{ ...st.dayHeader, justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-3)' }}>
+                  <span style={st.dayNumber}>Day {i + 1}</span>
+                  <span style={st.dayTitle}>{day.title}</span>
+                </div>
               </div>
 
               {/* Day Description (Flights, Transit, etc) */}
