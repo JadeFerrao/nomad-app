@@ -137,20 +137,6 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Destinations */}
-          <div style={footerStyles.column}>
-            <p style={footerStyles.colTitle}>Destinations</p>
-            <div style={footerStyles.colLinks}>
-              {["Paris", "Tokyo", "Bali", "Rome", "New York", "Istanbul"].map((c) => (
-                <Link key={c} href="/destinations" style={footerStyles.colLink} className="footer-link">
-                  {c}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-
-
           {/* Legal */}
           <div style={footerStyles.column}>
             <p style={footerStyles.colTitle}>Legal</p>

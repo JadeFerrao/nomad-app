@@ -1,7 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+// Register GSAP plugins
+gsap.registerPlugin(ScrollTrigger);
 
 /* ── SVG Icons instead of emojis ── */
 const MixMatchIcon = () => (
@@ -143,6 +148,55 @@ const st: Record<string, React.CSSProperties> = {
 };
 
 export default function FeaturesSection() {
+  const travelPlanningRef = useRef<HTMLSpanElement>(null);
+  const perfectedRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Animate "Travel Planning," from the left
+      gsap.fromTo(
+        travelPlanningRef.current,
+        {
+          opacity: 0,
+          x: -200,
+        },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: travelPlanningRef.current,
+            start: "top 80%",
+            toggleActions: "play none none none",
+          },
+        }
+      );
+
+      // Animate "Perfected" from the right
+      gsap.fromTo(
+        perfectedRef.current,
+        {
+          opacity: 0,
+          x: 200,
+        },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: perfectedRef.current,
+            start: "top 80%",
+            toggleActions: "play none none none",
+          },
+        }
+      );
+    });
+
+    return () => ctx.revert();
+  }, []);
+
   return (
     <section style={st.section}>
       <div style={st.container}>
@@ -154,7 +208,10 @@ export default function FeaturesSection() {
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
           <p style={st.label}>Why Nomad</p>
-          <h2 style={st.title}>Travel Planning, Perfected</h2>
+          <h2 style={st.title}>
+            <span ref={travelPlanningRef} style={{ display: 'inline-block' }}>Travel Planning,</span>{' '}
+            <span ref={perfectedRef} style={{ display: 'inline-block' }}>Perfected</span>
+          </h2>
           <p style={st.subtitle}>
             We believe every journey should feel personal. Here&apos;s what makes Nomad different.
           </p>

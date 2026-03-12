@@ -1,11 +1,16 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import { gsap } from "gsap";
+import { TextPlugin } from "gsap/TextPlugin";
 import { Spotlight } from "@/components/ui/spotlight";
 import { Globe } from "@/components/ui/globe";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+
+// Register GSAP plugins
+gsap.registerPlugin(TextPlugin);
 
 const heroStyles: Record<string, React.CSSProperties> = {
   section: {
@@ -189,6 +194,9 @@ const trustedLogos = [
 
 export default function HeroSection() {
   const [heroImage, setHeroImage] = React.useState("https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1920&q=80");
+  const travelTextRef = useRef<HTMLSpanElement>(null);
+  const reimaginedTextRef = useRef<HTMLSpanElement>(null);
+  const subtextRef = useRef<HTMLParagraphElement>(null);
 
   React.useEffect(() => {
     const fetchHeroImage = async () => {
@@ -223,6 +231,71 @@ export default function HeroSection() {
     fetchHeroImage();
   }, []);
 
+  // GSAP animation for the heading text
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Animate "Travel" dropping from the top
+      gsap.fromTo(
+        travelTextRef.current,
+        {
+          opacity: 0,
+          y: -100,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: "bounce.out",
+          delay: 0.3,
+        }
+      );
+
+      // Animate "Reimagined." swooshing in from the left
+      gsap.fromTo(
+        reimaginedTextRef.current,
+        {
+          opacity: 0,
+          x: -200,
+        },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 1.2,
+          ease: "power3.out",
+          delay: 0.8,
+        }
+      );
+
+      // Add a subtle continuous animation to "Reimagined."
+      gsap.to(reimaginedTextRef.current, {
+        textShadow: "0 0 20px rgba(200, 165, 90, 0.4)",
+        duration: 2,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+        delay: 2,
+      });
+
+      // Typing animation for subtext
+      if (subtextRef.current) {
+        const text = "Craft your perfect journey with intelligently curated itineraries. Mix luxury stays with street food adventures — travel your way.";
+        subtextRef.current.textContent = "";
+        
+        gsap.to(subtextRef.current, {
+          duration: text.length * 0.03, // Fast typing speed
+          text: {
+            value: text,
+            delimiter: "",
+          },
+          ease: "none",
+          delay: 1.5,
+        });
+      }
+    });
+
+    return () => ctx.revert();
+  }, []);
+
   const scrollToPlanner = () => {
     const el = document.getElementById("planner");
     if (el) el.scrollIntoView({ behavior: "smooth" });
@@ -250,12 +323,12 @@ export default function HeroSection() {
             </div>
 
             <h1 style={heroStyles.heading}>
-              Travel
+              <span ref={travelTextRef} style={{ display: 'inline-block' }}>Travel</span>
               <br />
-              <span style={heroStyles.headingAccent}>Reimagined.</span>
+              <span ref={reimaginedTextRef} style={{...heroStyles.headingAccent, display: 'inline-block'}}>Reimagined.</span>
             </h1>
 
-            <p style={heroStyles.subtext}>
+            <p ref={subtextRef} style={heroStyles.subtext}>
               Craft your perfect journey with intelligently curated itineraries.
               Mix luxury stays with street food adventures — travel your way.
             </p>

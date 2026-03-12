@@ -999,7 +999,14 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
               size="lg"
               onClick={handleGenerate}
               disabled={isLoading}
-              style={{ minWidth: 260, opacity: isLoading ? 0.7 : 1, color: "var(--color-black)", fontWeight: 600 }}
+              className={isLoading ? "shimmer-button" : ""}
+              style={{ 
+                minWidth: 260, 
+                color: "var(--color-black)", 
+                fontWeight: 600,
+                position: 'relative',
+                overflow: 'hidden'
+              }}
             >
               {isLoading ? "Generating Itinerary..." : "Generate Itinerary"}
               {!isLoading && (
@@ -1031,6 +1038,46 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
         }
         .dropdown-option-hover:hover {
           background: rgba(255, 255, 255, 0.04) !important;
+        }
+
+        /* Shimmer effect for loading button */
+        .shimmer-button::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.3),
+            transparent
+          );
+          animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+          0% {
+            left: -100%;
+          }
+          100% {
+            left: 100%;
+          }
+        }
+
+        /* Pulse animation for loading state */
+        .shimmer-button {
+          animation: pulse-scale 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-scale {
+          0%, 100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.02);
+          }
         }
       `}</style>
     </section>
