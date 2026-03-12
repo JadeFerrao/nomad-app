@@ -48,6 +48,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} ${playfair.variable}`}>
         {children}
+        <Analytics />
       </body>
     </html>
   );
