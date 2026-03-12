@@ -16,12 +16,7 @@ const fetchPexelsImage = async (query: string, orientation: 'landscape' | 'squar
     
     if (!PEXELS_API_KEY) {
       console.log("Pexels API key not found");
-      // Fallback to generic Unsplash images
-      const fallbackImages: Record<string, string> = {
-        landscape: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&h=800&fit=crop',
-        square: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=600&fit=crop'
-      };
-      return fallbackImages[orientation];
+      return '';
     }
 
     const response = await fetch(
@@ -43,12 +38,7 @@ const fetchPexelsImage = async (query: string, orientation: 'landscape' | 'squar
     console.error('Pexels API error:', error);
   }
   
-  // Fallback images
-  const fallbackImages: Record<string, string> = {
-    landscape: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&h=800&fit=crop',
-    square: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=600&fit=crop'
-  };
-  return fallbackImages[orientation];
+  return '';
 };
 
 const NomadBadge = () => (
@@ -195,8 +185,6 @@ export default function DestinationArticle() {
         setStImages([stResult]);
       } catch (error) {
         console.error('Error loading images:', error);
-        // Set fallback hero image
-        setHeroImage('https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1920&h=1080&fit=crop');
       } finally {
         setIsLoadingImages(false);
       }
@@ -226,22 +214,16 @@ export default function DestinationArticle() {
 
       <div style={s.page}>
         <section style={s.hero}>
-          {heroImage ? (
-            <img src={heroImage} alt={dest.city} style={s.heroImg} />
-          ) : (
-            <div style={{
+          {!heroImage ? (
+            <div className="skeleton-loader" style={{
               width: "100%",
               height: "100%",
-              background: "rgba(255,255,255,0.02)",
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--color-silver)',
-              fontFamily: 'var(--font-sans)',
-              fontSize: 'var(--text-sm)'
-            }}>
-              Loading...
-            </div>
+              background: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%)',
+              backgroundSize: '200% 100%',
+              animation: 'shimmer 1.5s infinite'
+            }} />
+          ) : (
+            <img src={heroImage} alt={dest.city} style={s.heroImg} />
           )}
           <div style={s.heroOverlay} />
           <div style={s.heroContent}>
@@ -269,21 +251,15 @@ export default function DestinationArticle() {
 
             <section>
               <h3 style={s.sectionTitle}>Must-Visit Experiences</h3>
-              {isLoadingImages ? (
-                <div style={{ 
+              {!hlImages.length || isLoadingImages ? (
+                <div className="skeleton-loader" style={{ 
                   height: 450, 
                   borderRadius: "var(--radius-2xl)", 
                   border: "1px solid rgba(255,255,255,0.06)",
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: 'rgba(255,255,255,0.02)',
-                  color: 'var(--color-silver)',
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: 'var(--text-sm)'
-                }}>
-                  Loading images...
-                </div>
+                  background: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%)',
+                  backgroundSize: '200% 100%',
+                  animation: 'shimmer 1.5s infinite'
+                }} />
               ) : (
                 <Slideshow items={hlItems} images={hlImages} />
               )}
@@ -291,20 +267,18 @@ export default function DestinationArticle() {
 
             <section>
               <h3 style={s.sectionTitle}>Gastronomic Roots</h3>
-              {isLoadingImages ? (
-                <div style={{ 
-                  height: 200, 
-                  borderRadius: "var(--radius-lg)", 
-                  border: "1px solid rgba(255,255,255,0.06)",
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: 'rgba(255,255,255,0.02)',
-                  color: 'var(--color-silver)',
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: 'var(--text-sm)'
-                }}>
-                  Loading food images...
+              {!fdImages.length || isLoadingImages ? (
+                <div style={s.foodGrid}>
+                  {fdItems.map((_, i) => (
+                    <div key={i} className="skeleton-loader" style={{ 
+                      height: 200, 
+                      borderRadius: "var(--radius-lg)", 
+                      border: "1px solid rgba(255,255,255,0.06)",
+                      background: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%)',
+                      backgroundSize: '200% 100%',
+                      animation: 'shimmer 1.5s infinite'
+                    }} />
+                  ))}
                 </div>
               ) : (
                 <div style={s.foodGrid}>
@@ -322,20 +296,14 @@ export default function DestinationArticle() {
 
             <section style={{ ...s.contentBlock, padding: 0, overflow: "hidden", display: "flex", flexDirection: "column" }}>
                <div style={{ height: 350, width: "100%", position: "relative" }}>
-                 {isLoadingImages ? (
-                   <div style={{ 
+                 {!stImages.length || isLoadingImages ? (
+                   <div className="skeleton-loader" style={{ 
                      width: "100%", 
                      height: "100%", 
-                     display: 'flex',
-                     alignItems: 'center',
-                     justifyContent: 'center',
-                     background: 'rgba(255,255,255,0.02)',
-                     color: 'var(--color-silver)',
-                     fontFamily: 'var(--font-sans)',
-                     fontSize: 'var(--text-sm)'
-                   }}>
-                     Loading hotel image...
-                   </div>
+                     background: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%)',
+                     backgroundSize: '200% 100%',
+                     animation: 'shimmer 1.5s infinite'
+                   }} />
                  ) : (
                    <>
                      <img src={stImages[0]} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="Stay" />
@@ -387,6 +355,15 @@ export default function DestinationArticle() {
       <Footer />
 
       <style jsx global>{`
+        @keyframes shimmer {
+          0% {
+            background-position: -200% 0;
+          }
+          100% {
+            background-position: 200% 0;
+          }
+        }
+        
         @media (min-width: 1024px) { .grid-layout { grid-template-columns: 1.8fr 1fr !important; } }
         @media (max-width: 767px) { .stay-grid { grid-template-columns: 1fr !important; } }
         @media (min-width: 768px) { .stay-grid { grid-template-columns: 1fr 2fr !important; gap: var(--space-10) !important; align-items: center !important; } }

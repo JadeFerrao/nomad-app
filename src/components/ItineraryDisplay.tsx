@@ -714,6 +714,47 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
       const jsPDF = (await import('jspdf')).default;
       const html2canvas = (await import('html2canvas')).default;
 
+      // Helper function to convert image URL to base64
+      const getBase64Image = async (url: string): Promise<string> => {
+        try {
+          const response = await fetch(url);
+          const blob = await response.blob();
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+        } catch (error) {
+          console.error('Error loading image:', error);
+          return '';
+        }
+      };
+
+      // Pre-load all images as base64
+      const imagePromises: Promise<{cat: string, day: number, base64: string}>[] = [];
+      displayDays.forEach((day: any, dayIndex: number) => {
+        categories.forEach((cat) => {
+          const tier = selections[cat];
+          const item = day[cat][tier];
+          if (item.image) {
+            imagePromises.push(
+              getBase64Image(item.image).then(base64 => ({
+                cat,
+                day: dayIndex,
+                base64
+              }))
+            );
+          }
+        });
+      });
+
+      const loadedImages = await Promise.all(imagePromises);
+      const imageMap: Record<string, string> = {};
+      loadedImages.forEach(img => {
+        imageMap[`${img.day}-${img.cat}`] = img.base64;
+      });
+
       // Create a temporary container with the itinerary content
       const tempContainer = document.createElement('div');
       tempContainer.style.position = 'absolute';
@@ -793,12 +834,15 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
                     eat: '#fd7e14', 
                     explore: '#6f42c1'
                   };
+                  const imageKey = `${i}-${cat}`;
+                  const base64Image = imageMap[imageKey];
                   
                   return `
                     <div style="display: flex; background: #fff; border: 1px solid #e9ecef; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                      <div style="width: 80px; height: 80px; background: #f0f0f0; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #666;">
-                        IMG
-                      </div>
+                      ${base64Image ? 
+                        `<img src="${base64Image}" style="width: 80px; height: 80px; object-fit: cover; flex-shrink: 0;" crossorigin="anonymous" />` :
+                        `<div style="width: 80px; height: 80px; background: #f0f0f0; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #666;">IMG</div>`
+                      }
                       <div style="padding: 16px; flex: 1;">
                         <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; color: ${categoryColors[cat]};">
                           ${categoryLabels[cat]}

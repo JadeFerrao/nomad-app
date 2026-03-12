@@ -190,6 +190,7 @@ const trustedLogos = [
   "/expedia.svg",
   "/airbnb.svg",
   "/makemytrip.svg",
+  "/uber.svg",
 ];
 
 export default function HeroSection() {

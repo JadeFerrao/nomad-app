@@ -206,7 +206,8 @@ const s: Record<string, React.CSSProperties> = {
 export default function DestinationsPage() {
   const [activeRegion, setActiveRegion] = useState("All");
   const [destinationsWithImages, setDestinationsWithImages] = useState<DestinationEntry[]>(allDestinations);
-  const [isLoadingImages, setIsLoadingImages] = useState(false);
+  const [isLoadingImages, setIsLoadingImages] = useState(true);
+  const [loadedImageIndices, setLoadedImageIndices] = useState<Set<number>>(new Set());
 
   // Fetch real images from Pexels on mount
   React.useEffect(() => {
@@ -222,7 +223,7 @@ export default function DestinationsPage() {
         }
 
         const updatedDestinations = await Promise.all(
-          allDestinations.map(async (dest) => {
+          allDestinations.map(async (dest, index) => {
             try {
               const query = `${dest.city} ${dest.country} landmark`;
               const response = await fetch(
@@ -237,6 +238,7 @@ export default function DestinationsPage() {
               if (response.ok) {
                 const data = await response.json();
                 if (data.photos && data.photos.length > 0) {
+                  setLoadedImageIndices(prev => new Set(prev).add(index));
                   return {
                     ...dest,
                     image: data.photos[0].src.large
@@ -246,7 +248,7 @@ export default function DestinationsPage() {
             } catch (error) {
               console.error(`Error fetching image for ${dest.city}:`, error);
             }
-            // Keep original image if fetch fails
+            setLoadedImageIndices(prev => new Set(prev).add(index));
             return dest;
           })
         );
@@ -305,33 +307,36 @@ export default function DestinationsPage() {
           </div>
 
           {/* Cards Grid */}
-          {isLoadingImages && (
-            <div style={{
-              textAlign: 'center',
-              padding: 'var(--space-8)',
-              color: 'var(--color-silver)',
-              fontFamily: 'var(--font-sans)',
-              fontSize: 'var(--text-sm)'
-            }}>
-              Loading destination images...
-            </div>
-          )}
           <div style={s.grid} className="destinations-grid">
-            {filtered.map((dest, i) => (
-              <motion.div
-                key={dest.slug}
-                style={s.card}
-                className="destination-card"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: 0.5,
-                  delay: i * 0.08,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={dest.image} alt={dest.city} style={s.cardImage} />
+            {filtered.map((dest, i) => {
+              const originalIndex = allDestinations.findIndex(d => d.slug === dest.slug);
+              const imageLoaded = loadedImageIndices.has(originalIndex);
+              
+              return (
+                <motion.div
+                  key={dest.slug}
+                  style={s.card}
+                  className="destination-card"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.5,
+                    delay: i * 0.08,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
+                >
+                  {!imageLoaded ? (
+                    <div className="skeleton-loader" style={{
+                      width: '100%',
+                      height: 240,
+                      background: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%)',
+                      backgroundSize: '200% 100%',
+                      animation: 'shimmer 1.5s infinite'
+                    }} />
+                  ) : (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={dest.image} alt={dest.city} style={s.cardImage} />
+                  )}
 
                 <div style={s.cardBody}>
                   <span style={s.cardRegion}>{dest.region} · {dest.country}</span>
@@ -364,7 +369,8 @@ export default function DestinationsPage() {
                   </Link>
                 </div>
               </motion.div>
-            ))}
+            );
+            })}
           </div>
         </div>
       </div>
@@ -372,6 +378,15 @@ export default function DestinationsPage() {
       <Footer />
 
       <style jsx global>{`
+        @keyframes shimmer {
+          0% {
+            background-position: -200% 0;
+          }
+          100% {
+            background-position: 200% 0;
+          }
+        }
+        
         @media (min-width: 768px) {
           .destinations-grid {
             grid-template-columns: repeat(2, 1fr) !important;
