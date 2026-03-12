@@ -184,16 +184,66 @@ Make sure there are exactly ${days} items in the "days" array. Avoid generic nam
       throw new Error("Failed to parse AI response as JSON.");
     }
 
-    // Process parsedContent to add AI generated images using Pollinations AI
-    const processedDays = parsedContent.days.map((day: any) => {
-      // Helper to cleanly encode prompts
-      const getImageUrl = (type: string, spotName: string) => {
-        // Keep prompt short & clean for better API success
-        const cleanName = spotName.split('(')[0].trim();
-        let p = `${cleanName} ${destinations[0]}`;
+    // Helper function to search for images using Pexels with better fallbacks
+    const searchImageForLocation = async (locationName: string, destination: string, type: string): Promise<string> => {
+      try {
+        const query = `${locationName} ${destination}`;
+        const PEXELS_API_KEY = Deno.env.get("PEXELS_API_KEY");
         
-        return `https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?width=500&height=300&nologo=true`;
-      };
+        if (PEXELS_API_KEY) {
+          const searchResponse = await fetch(
+            `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=1&orientation=landscape`,
+            {
+              headers: {
+                'Authorization': PEXELS_API_KEY
+              }
+            }
+          );
+          
+          if (searchResponse.ok) {
+            const data = await searchResponse.json();
+            if (data.photos && data.photos.length > 0) {
+              return data.photos[0].src.large;
+            }
+          }
+        }
+        
+        // Fallback to category-specific generic images from Unsplash
+        const fallbackImages: Record<string, string> = {
+          hotel: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500&h=300&fit=crop',
+          restaurant: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=500&h=300&fit=crop',
+          attraction: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=500&h=300&fit=crop'
+        };
+        return fallbackImages[type] || fallbackImages.attraction;
+        
+      } catch (error) {
+        console.error('Image search error:', error);
+        // Ultimate fallback - generic travel images
+        const fallbackImages: Record<string, string> = {
+          hotel: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500&h=300&fit=crop',
+          restaurant: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=500&h=300&fit=crop',
+          attraction: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=500&h=300&fit=crop'
+        };
+        return fallbackImages[type] || fallbackImages.attraction;
+      }
+    };
+        const fallbackImages: Record<string, string> = {
+          stay: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500&h=300&fit=crop',
+          eat: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=500&h=300&fit=crop',
+          explore: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=500&h=300&fit=crop'
+        };
+        return fallbackImages[type] || fallbackImages.explore;
+      }
+    };
+
+    // Process parsedContent to add real images from web search
+    const processedDays = await Promise.all(parsedContent.days.map(async (day: any) => {
+      // Fetch images in parallel for each day
+      const [stayImage, eatImage, exploreImage] = await Promise.all([
+        searchImageForLocation(day.stay.name, destinations[0], 'hotel'),
+        searchImageForLocation(day.eat.name, destinations[0], 'restaurant'),
+        searchImageForLocation(day.explore.name, destinations[0], 'attraction')
+      ]);
 
       return {
         title: day.title,
@@ -202,25 +252,28 @@ Make sure there are exactly ${days} items in the "days" array. Avoid generic nam
           [selections.stay]: {
             name: day.stay.name,
             price: day.stay.price,
-            image: getImageUrl('stay', day.stay.name),
+            image: stayImage,
+            location_url: day.stay.location_url,
           }
         },
         eat: {
           [selections.eat]: {
             name: day.eat.name,
             price: day.eat.price,
-            image: getImageUrl('eat', day.eat.name),
+            image: eatImage,
+            location_url: day.eat.location_url,
           }
         },
         explore: {
           [selections.explore]: {
             name: day.explore.name,
             price: day.explore.price,
-            image: getImageUrl('explore', day.explore.name),
+            image: exploreImage,
+            location_url: day.explore.location_url,
           }
         }
       };
-    });
+    }));
 
     return new Response(JSON.stringify({
       name: parsedContent.name,

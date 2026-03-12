@@ -205,11 +205,67 @@ const s: Record<string, React.CSSProperties> = {
 
 export default function DestinationsPage() {
   const [activeRegion, setActiveRegion] = useState("All");
+  const [destinationsWithImages, setDestinationsWithImages] = useState<DestinationEntry[]>(allDestinations);
+  const [isLoadingImages, setIsLoadingImages] = useState(false);
+
+  // Fetch real images from Pexels on mount
+  React.useEffect(() => {
+    const fetchImages = async () => {
+      setIsLoadingImages(true);
+      try {
+        const PEXELS_API_KEY = process.env.NEXT_PUBLIC_PEXELS_API_KEY;
+        
+        if (!PEXELS_API_KEY) {
+          console.log("Pexels API key not found, using default images");
+          setIsLoadingImages(false);
+          return;
+        }
+
+        const updatedDestinations = await Promise.all(
+          allDestinations.map(async (dest) => {
+            try {
+              const query = `${dest.city} ${dest.country} landmark`;
+              const response = await fetch(
+                `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=1&orientation=landscape`,
+                {
+                  headers: {
+                    'Authorization': PEXELS_API_KEY
+                  }
+                }
+              );
+
+              if (response.ok) {
+                const data = await response.json();
+                if (data.photos && data.photos.length > 0) {
+                  return {
+                    ...dest,
+                    image: data.photos[0].src.large
+                  };
+                }
+              }
+            } catch (error) {
+              console.error(`Error fetching image for ${dest.city}:`, error);
+            }
+            // Keep original image if fetch fails
+            return dest;
+          })
+        );
+
+        setDestinationsWithImages(updatedDestinations);
+      } catch (error) {
+        console.error("Error fetching images:", error);
+      } finally {
+        setIsLoadingImages(false);
+      }
+    };
+
+    fetchImages();
+  }, []);
 
   const filtered =
     activeRegion === "All"
-      ? allDestinations
-      : allDestinations.filter((d) => d.region === activeRegion);
+      ? destinationsWithImages
+      : destinationsWithImages.filter((d) => d.region === activeRegion);
 
   return (
     <>
@@ -249,6 +305,17 @@ export default function DestinationsPage() {
           </div>
 
           {/* Cards Grid */}
+          {isLoadingImages && (
+            <div style={{
+              textAlign: 'center',
+              padding: 'var(--space-8)',
+              color: 'var(--color-silver)',
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'var(--text-sm)'
+            }}>
+              Loading destination images...
+            </div>
+          )}
           <div style={s.grid} className="destinations-grid">
             {filtered.map((dest, i) => (
               <motion.div

@@ -19,7 +19,6 @@ const heroStyles: Record<string, React.CSSProperties> = {
   bgImage: {
     position: "absolute",
     inset: 0,
-    backgroundImage: "url(https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1920&q=80)",
     backgroundSize: "cover",
     backgroundPosition: "center",
     opacity: 0.08,
@@ -189,6 +188,41 @@ const trustedLogos = [
 ];
 
 export default function HeroSection() {
+  const [heroImage, setHeroImage] = React.useState("https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1920&q=80");
+
+  React.useEffect(() => {
+    const fetchHeroImage = async () => {
+      try {
+        const PEXELS_API_KEY = process.env.NEXT_PUBLIC_PEXELS_API_KEY;
+        
+        if (!PEXELS_API_KEY) {
+          console.log("Pexels API key not found, using default hero image");
+          return;
+        }
+
+        const response = await fetch(
+          `https://api.pexels.com/v1/search?query=travel+adventure+destination&per_page=1&orientation=landscape`,
+          {
+            headers: {
+              'Authorization': PEXELS_API_KEY
+            }
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.photos && data.photos.length > 0) {
+            setHeroImage(data.photos[0].src.large2x);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching hero image:", error);
+      }
+    };
+
+    fetchHeroImage();
+  }, []);
+
   const scrollToPlanner = () => {
     const el = document.getElementById("planner");
     if (el) el.scrollIntoView({ behavior: "smooth" });
@@ -197,7 +231,7 @@ export default function HeroSection() {
   return (
     <>
       <section id="hero" style={heroStyles.section}>
-        <div style={heroStyles.bgImage} />
+        <div style={{...heroStyles.bgImage, backgroundImage: `url(${heroImage})`}} />
         <div style={heroStyles.bgGradient} />
         <div style={heroStyles.spotlightWrap}>
           <Spotlight fill="rgba(200, 165, 90, 0.06)" />

@@ -9,18 +9,47 @@ import Navbar from "@/components/Navbar";
 import Marquee from "@/components/Marquee";
 import Footer from "@/components/Footer";
 
-// Utility to generate hyper-relevant images using AI
-const getImages = (type: "hl" | "fd" | "st", count: number, slug: string, specificPrompts: string[] = []) => {
-  return Array.from({length: count}).map((_, i) => {
-    let prompt = "";
-    if (type === "hl") prompt = `${specificPrompts[i] || "landmark"} in ${slug} highly detailed 4k travel photography epic lighting`;
-    else if (type === "fd") prompt = `${specificPrompts[i] || "local cuisine"} dish from ${slug} delicious professional food photography`;
-    else prompt = `premium luxury boutique hotel or resort in ${slug} beautiful architectural photography`;
+// Utility to fetch real images using Pexels API
+const fetchPexelsImage = async (query: string, orientation: 'landscape' | 'square' = 'landscape'): Promise<string> => {
+  try {
+    const PEXELS_API_KEY = process.env.NEXT_PUBLIC_PEXELS_API_KEY;
     
-    // Pollinations AI generates real images on the fly via URL prompts
-    return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${type === "fd" ? 600 : 1200}&height=${type === "fd" ? 600 : 800}&nologo=true&model=flux&seed=${slug.length}`;
-  });
-}
+    if (!PEXELS_API_KEY) {
+      console.log("Pexels API key not found");
+      // Fallback to generic Unsplash images
+      const fallbackImages: Record<string, string> = {
+        landscape: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&h=800&fit=crop',
+        square: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=600&fit=crop'
+      };
+      return fallbackImages[orientation];
+    }
+
+    const response = await fetch(
+      `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=1&orientation=${orientation}`,
+      {
+        headers: {
+          'Authorization': PEXELS_API_KEY
+        }
+      }
+    );
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.photos && data.photos.length > 0) {
+        return orientation === 'square' ? data.photos[0].src.medium : data.photos[0].src.large;
+      }
+    }
+  } catch (error) {
+    console.error('Pexels API error:', error);
+  }
+  
+  // Fallback images
+  const fallbackImages: Record<string, string> = {
+    landscape: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&h=800&fit=crop',
+    square: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=600&fit=crop'
+  };
+  return fallbackImages[orientation];
+};
 
 const NomadBadge = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -120,6 +149,61 @@ const s: Record<string, React.CSSProperties> = {
 export default function DestinationArticle() {
   const { slug } = useParams();
   const dest = allDestinations.find((d) => d.slug === slug);
+  
+  const [heroImage, setHeroImage] = useState<string>('');
+  const [hlImages, setHlImages] = useState<string[]>([]);
+  const [fdImages, setFdImages] = useState<string[]>([]);
+  const [stImages, setStImages] = useState<string[]>([]);
+  const [isLoadingImages, setIsLoadingImages] = useState(true);
+
+  React.useEffect(() => {
+    if (!dest) return;
+
+    const loadImages = async () => {
+      setIsLoadingImages(true);
+      
+      const hlItems = dest.visit || dest.highlights;
+      const fdItems = dest.food || ["Local Cuisine"];
+
+      try {
+        // Fetch hero image
+        const heroPromise = fetchPexelsImage(`${dest.city} ${dest.country} cityscape`, 'landscape');
+        
+        // Fetch highlight images
+        const hlPromises = hlItems.map(item => 
+          fetchPexelsImage(`${item} ${dest.city} ${dest.country}`, 'landscape')
+        );
+        
+        // Fetch food images
+        const fdPromises = fdItems.map(item => 
+          fetchPexelsImage(`${item} ${dest.country} food`, 'square')
+        );
+        
+        // Fetch stay image
+        const stPromise = fetchPexelsImage(`luxury hotel ${dest.city} ${dest.country}`, 'landscape');
+
+        const [heroResult, hlResults, fdResults, stResult] = await Promise.all([
+          heroPromise,
+          Promise.all(hlPromises),
+          Promise.all(fdPromises),
+          stPromise
+        ]);
+
+        setHeroImage(heroResult);
+        setHlImages(hlResults);
+        setFdImages(fdResults);
+        setStImages([stResult]);
+      } catch (error) {
+        console.error('Error loading images:', error);
+        // Set fallback hero image
+        setHeroImage('https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1920&h=1080&fit=crop');
+      } finally {
+        setIsLoadingImages(false);
+      }
+    };
+
+    loadImages();
+  }, [dest]);
 
   if (!dest) {
     return (
@@ -132,14 +216,8 @@ export default function DestinationArticle() {
     );
   }
 
-  // Pre-generate deterministic images for this destination
   const hlItems = dest.visit || dest.highlights;
-  const hlImages = getImages("hl", hlItems.length, dest.city, hlItems);
-  
   const fdItems = dest.food || ["Local Cuisine"];
-  const fdImages = getImages("fd", fdItems.length, dest.city, fdItems);
-  
-  const stImages = getImages("st", 1, dest.city);
 
   return (
     <>
@@ -148,7 +226,23 @@ export default function DestinationArticle() {
 
       <div style={s.page}>
         <section style={s.hero}>
-          <img src={dest.image} alt={dest.city} style={s.heroImg} />
+          {heroImage ? (
+            <img src={heroImage} alt={dest.city} style={s.heroImg} />
+          ) : (
+            <div style={{
+              width: "100%",
+              height: "100%",
+              background: "rgba(255,255,255,0.02)",
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--color-silver)',
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'var(--text-sm)'
+            }}>
+              Loading...
+            </div>
+          )}
           <div style={s.heroOverlay} />
           <div style={s.heroContent}>
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}>
@@ -175,27 +269,79 @@ export default function DestinationArticle() {
 
             <section>
               <h3 style={s.sectionTitle}>Must-Visit Experiences</h3>
-              <Slideshow items={hlItems} images={hlImages} />
+              {isLoadingImages ? (
+                <div style={{ 
+                  height: 450, 
+                  borderRadius: "var(--radius-2xl)", 
+                  border: "1px solid rgba(255,255,255,0.06)",
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'rgba(255,255,255,0.02)',
+                  color: 'var(--color-silver)',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 'var(--text-sm)'
+                }}>
+                  Loading images...
+                </div>
+              ) : (
+                <Slideshow items={hlItems} images={hlImages} />
+              )}
             </section>
 
             <section>
               <h3 style={s.sectionTitle}>Gastronomic Roots</h3>
-              <div style={s.foodGrid}>
-                {fdItems.map((f, i) => (
-                  <div key={i} style={s.foodCard} className="hover-brightness">
-                    <img src={fdImages[i]} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt={f} />
-                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(10,10,10,0.95), transparent)", padding: "var(--space-5)", display: "flex", alignItems: "flex-end" }}>
-                       <span style={{ color: "var(--color-white)", fontSize: "var(--text-base)", fontWeight: 500, fontFamily: "var(--font-sans)", lineHeight: 1.3 }}>{f}</span>
+              {isLoadingImages ? (
+                <div style={{ 
+                  height: 200, 
+                  borderRadius: "var(--radius-lg)", 
+                  border: "1px solid rgba(255,255,255,0.06)",
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'rgba(255,255,255,0.02)',
+                  color: 'var(--color-silver)',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 'var(--text-sm)'
+                }}>
+                  Loading food images...
+                </div>
+              ) : (
+                <div style={s.foodGrid}>
+                  {fdItems.map((f, i) => (
+                    <div key={i} style={s.foodCard} className="hover-brightness">
+                      <img src={fdImages[i]} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt={f} />
+                      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(10,10,10,0.95), transparent)", padding: "var(--space-5)", display: "flex", alignItems: "flex-end" }}>
+                         <span style={{ color: "var(--color-white)", fontSize: "var(--text-base)", fontWeight: 500, fontFamily: "var(--font-sans)", lineHeight: 1.3 }}>{f}</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </section>
 
             <section style={{ ...s.contentBlock, padding: 0, overflow: "hidden", display: "flex", flexDirection: "column" }}>
                <div style={{ height: 350, width: "100%", position: "relative" }}>
-                 <img src={stImages[0]} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="Stay" />
-                 <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(10,10,10,1) 20%, rgba(10,10,10,0.4) 60%, transparent 100%)" }} />
+                 {isLoadingImages ? (
+                   <div style={{ 
+                     width: "100%", 
+                     height: "100%", 
+                     display: 'flex',
+                     alignItems: 'center',
+                     justifyContent: 'center',
+                     background: 'rgba(255,255,255,0.02)',
+                     color: 'var(--color-silver)',
+                     fontFamily: 'var(--font-sans)',
+                     fontSize: 'var(--text-sm)'
+                   }}>
+                     Loading hotel image...
+                   </div>
+                 ) : (
+                   <>
+                     <img src={stImages[0]} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="Stay" />
+                     <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(10,10,10,1) 20%, rgba(10,10,10,0.4) 60%, transparent 100%)" }} />
+                   </>
+                 )}
                  <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "var(--space-10)", zIndex: 10 }}>
                    <div style={{ display: "grid", gap: "var(--space-8)" }} className="stay-grid">
                      <div style={{ display: "flex", alignItems: "flex-start", gap: "var(--space-3)", marginBottom: "var(--space-4)" }}>
