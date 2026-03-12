@@ -227,14 +227,6 @@ Make sure there are exactly ${days} items in the "days" array. Avoid generic nam
         return fallbackImages[type] || fallbackImages.attraction;
       }
     };
-        const fallbackImages: Record<string, string> = {
-          stay: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500&h=300&fit=crop',
-          eat: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=500&h=300&fit=crop',
-          explore: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=500&h=300&fit=crop'
-        };
-        return fallbackImages[type] || fallbackImages.explore;
-      }
-    };
 
     // Process parsedContent to add real images from web search
     const processedDays = await Promise.all(parsedContent.days.map(async (day: any) => {
