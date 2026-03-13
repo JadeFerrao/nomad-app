@@ -259,6 +259,7 @@ const s: Record<string, React.CSSProperties> = {
     fontFamily: "var(--font-sans)",
     fontSize: "var(--text-xs)",
     fontWeight: 600,
+    marginTop: "var(--space-20)",
     letterSpacing: "0.15em",
     textTransform: "uppercase" as const,
     color: "var(--color-accent)",
@@ -873,11 +874,13 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
               <label style={s.fieldLabel}>Travelers</label>
               <input
                 type="number"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 min={1}
                 max={10}
                 value={people}
                 onChange={(e) => setPeople(Math.max(1, Math.min(10, parseInt(e.target.value) || 1)))}
-                style={s.input}
+                style={{...s.input, WebkitAppearance: "none", MozAppearance: "textfield"}}
               />
             </div>
 
@@ -1001,9 +1004,9 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
               onClick={handleGenerate}
               disabled={isLoading}
               className={isLoading ? "shimmer-button" : ""}
-              style={{ 
-                minWidth: 260, 
-                color: "var(--color-black)", 
+              style={{
+                minWidth: 260,
+                color: "var(--color-black)",
                 fontWeight: 600,
                 position: 'relative',
                 overflow: 'hidden'

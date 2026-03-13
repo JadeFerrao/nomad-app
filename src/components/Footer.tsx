@@ -137,10 +137,13 @@ export default function Footer() {
             </p>
           </div>
 
+          {/* Empty spacer */}
+          <div></div>
+
           {/* Legal */}
-          <div style={footerStyles.column}>
-            <p style={footerStyles.colTitle}>Legal</p>
-            <div style={footerStyles.colLinks}>
+          <div style={{...footerStyles.column, textAlign: "right" as const}} className="footer-legal">
+            <p style={{...footerStyles.colTitle, textAlign: "right" as const}} className="footer-legal-title">Legal</p>
+            <div style={{...footerStyles.colLinks, alignItems: "flex-end"}} className="footer-legal-links">
               <Link href="/privacy" style={footerStyles.colLink} className="footer-link">
                 Privacy Policy
               </Link>
@@ -153,7 +156,7 @@ export default function Footer() {
 
         <div style={footerStyles.divider} />
 
-        <div style={footerStyles.bottom}>
+        <div style={footerStyles.bottom} className="footer-bottom">
           <span style={footerStyles.copyright}>
             © {new Date().getFullYear()} Nomad. All rights reserved.
           </span>
@@ -164,10 +167,10 @@ export default function Footer() {
             color: "var(--color-ash)",
             fontWeight: 300,
             margin: 0,
-          }}>
+          }} className="footer-bottom-traveller">
             Built by a traveller for all other travellers ❤️
           </p>
-          <div style={footerStyles.socials}>
+          <div style={footerStyles.socials} className="footer-bottom-socials">
             {["𝕏", "IG", "in"].map((s) => (
               <button key={s} style={footerStyles.socialLink} className="social-icon-hover">
                 {s}
@@ -188,6 +191,31 @@ export default function Footer() {
         @media (min-width: 768px) {
           .footer-grid {
             grid-template-columns: 2fr 1fr 1fr !important;
+          }
+        }
+        @media (max-width: 767px) {
+          .footer-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .footer-legal {
+            text-align: left !important;
+          }
+          .footer-legal-title {
+            text-align: left !important;
+          }
+          .footer-legal-links {
+            align-items: flex-start !important;
+          }
+          .footer-bottom {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: var(--space-6) !important;
+          }
+          .footer-bottom-traveller {
+            order: 2 !important;
+          }
+          .footer-bottom-socials {
+            order: 3 !important;
           }
         }
       `}</style>

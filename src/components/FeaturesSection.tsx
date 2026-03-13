@@ -86,6 +86,7 @@ const st: Record<string, React.CSSProperties> = {
     fontFamily: "var(--font-sans)",
     fontSize: "var(--text-xs)",
     fontWeight: 600,
+    marginTop: "var(--space-20)",
     letterSpacing: "0.15em",
     textTransform: "uppercase" as const,
     color: "var(--color-accent)",

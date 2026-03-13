@@ -65,6 +65,7 @@ const heroStyles: Record<string, React.CSSProperties> = {
     textTransform: "uppercase" as const,
     color: "var(--color-accent)",
     marginBottom: "var(--space-6)",
+    marginTop: "var(--space-6)",
     display: "flex",
     alignItems: "center",
     gap: "var(--space-3)",
@@ -151,6 +152,7 @@ const heroStyles: Record<string, React.CSSProperties> = {
   trustedBy: {
     position: "relative",
     padding: "var(--space-6) 0",
+    marginTop: "var(--space-20)",
     borderTop: "1px solid rgba(255, 255, 255, 0.05)",
     borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
     background: "rgba(255, 255, 255, 0.02)",
@@ -203,7 +205,7 @@ export default function HeroSection() {
     const fetchHeroImage = async () => {
       try {
         const PEXELS_API_KEY = process.env.NEXT_PUBLIC_PEXELS_API_KEY;
-        
+
         if (!PEXELS_API_KEY) {
           console.log("Pexels API key not found, using default hero image");
           return;
@@ -281,7 +283,7 @@ export default function HeroSection() {
       if (subtextRef.current) {
         const text = "Craft your perfect journey with intelligently curated itineraries. Mix luxury stays with street food adventures — travel your way.";
         subtextRef.current.textContent = "";
-        
+
         gsap.to(subtextRef.current, {
           duration: text.length * 0.03, // Fast typing speed
           text: {
@@ -305,7 +307,7 @@ export default function HeroSection() {
   return (
     <>
       <section id="hero" style={heroStyles.section}>
-        <div style={{...heroStyles.bgImage, backgroundImage: `url(${heroImage})`}} />
+        <div style={{ ...heroStyles.bgImage, backgroundImage: `url(${heroImage})` }} />
         <div style={heroStyles.bgGradient} />
         <div style={heroStyles.spotlightWrap}>
           <Spotlight fill="rgba(200, 165, 90, 0.06)" />
@@ -326,7 +328,7 @@ export default function HeroSection() {
             <h1 style={heroStyles.heading}>
               <span ref={travelTextRef} style={{ display: 'inline-block' }}>Travel</span>
               <br />
-              <span ref={reimaginedTextRef} style={{...heroStyles.headingAccent, display: 'inline-block'}}>Reimagined.</span>
+              <span ref={reimaginedTextRef} style={{ ...heroStyles.headingAccent, display: 'inline-block' }}>Reimagined.</span>
             </h1>
 
             <p ref={subtextRef} style={heroStyles.subtext}>
