@@ -846,7 +846,7 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
             {/* Block 2: Dates */}
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <label style={s.fieldLabel}>Travel Dates (DD/MM/YYYY)</label>
-              <div className="date-input-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-2)' }}>
+              <div className="date-input-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
                 <input
                   type="date"
                   value={startDate}
@@ -873,13 +873,20 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <label style={s.fieldLabel}>Travelers</label>
               <input
-                type="number"
+                type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                min={1}
-                max={10}
                 value={people}
-                onChange={(e) => setPeople(Math.max(1, Math.min(10, parseInt(e.target.value) || 1)))}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/[^0-9]/g, '');
+                  const num = val === '' ? 1 : parseInt(val);
+                  setPeople(Math.max(1, Math.min(10, num)));
+                }}
+                onBlur={(e) => {
+                  if (e.target.value === '' || parseInt(e.target.value) < 1) {
+                    setPeople(1);
+                  }
+                }}
                 style={{...s.input, WebkitAppearance: "none", MozAppearance: "textfield"}}
               />
             </div>
