@@ -873,21 +873,45 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <label style={s.fieldLabel}>Travelers</label>
               <input
-                type="text"
+                type="tel"
                 inputMode="numeric"
-                pattern="[0-9]*"
-                value={people}
-                onChange={(e) => {
-                  const val = e.target.value.replace(/[^0-9]/g, '');
-                  const num = val === '' ? 1 : parseInt(val);
-                  setPeople(Math.max(1, Math.min(10, num)));
+                maxLength={2}
+                value={people.toString()}
+                onClick={(e) => {
+                  const target = e.target as HTMLInputElement;
+                  target.select();
                 }}
-                onBlur={(e) => {
-                  if (e.target.value === '' || parseInt(e.target.value) < 1) {
+                onChange={(e) => {
+                  const input = e.target.value;
+                  // Remove all non-numeric characters
+                  const cleaned = input.replace(/\D/g, '');
+                  
+                  if (cleaned === '') {
+                    setPeople(1);
+                    return;
+                  }
+                  
+                  // Parse as integer
+                  let num = parseInt(cleaned, 10);
+                  
+                  // Clamp between 1 and 10
+                  if (num < 1) num = 1;
+                  if (num > 10) num = 10;
+                  
+                  setPeople(num);
+                }}
+                onBlur={() => {
+                  // Ensure valid value on blur
+                  if (people < 1 || isNaN(people)) {
                     setPeople(1);
                   }
                 }}
-                style={{...s.input, WebkitAppearance: "none", MozAppearance: "textfield"}}
+                style={{
+                  ...s.input, 
+                  WebkitAppearance: "none", 
+                  MozAppearance: "textfield",
+                  fontSize: "var(--text-base)",
+                }}
               />
             </div>
 
@@ -1040,7 +1064,7 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
             grid-template-columns: 1fr !important;
           }
           .date-input-grid {
-            grid-template-columns: 1fr !important;
+            grid-template-columns: 1fr 1fr !important;
             gap: var(--space-3) !important;
           }
         }
@@ -1048,6 +1072,18 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
           .budget-input-grid {
             grid-template-columns: 1fr 1fr !important;
           }
+        }
+        
+        /* Fix for number inputs on mobile */
+        input[type="tel"]::-webkit-outer-spin-button,
+        input[type="tel"]::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        
+        input[type="tel"] {
+          -moz-appearance: textfield;
+        }
         }
         
         /* Date input styling */
