@@ -141,11 +141,12 @@ export default function Footer() {
           <div style={footerStyles.column}>
             <p style={footerStyles.colTitle}>Legal</p>
             <div style={footerStyles.colLinks}>
-              {["Privacy Policy", "Terms of Service", "Cookie Policy"].map((c) => (
-                <button key={c} style={footerStyles.colLink} className="footer-link">
-                  {c}
-                </button>
-              ))}
+              <Link href="/privacy" style={footerStyles.colLink} className="footer-link">
+                Privacy Policy
+              </Link>
+              <Link href="/terms" style={footerStyles.colLink} className="footer-link">
+                Terms of Service
+              </Link>
             </div>
           </div>
         </div>
@@ -156,6 +157,16 @@ export default function Footer() {
           <span style={footerStyles.copyright}>
             © {new Date().getFullYear()} Nomad. All rights reserved.
           </span>
+          <p style={{
+            fontFamily: "var(--font-serif)",
+            fontSize: "var(--text-sm)",
+            fontStyle: "italic",
+            color: "var(--color-ash)",
+            fontWeight: 300,
+            margin: 0,
+          }}>
+            Built by a traveller for all other travellers ❤️
+          </p>
           <div style={footerStyles.socials}>
             {["𝕏", "IG", "in"].map((s) => (
               <button key={s} style={footerStyles.socialLink} className="social-icon-hover">

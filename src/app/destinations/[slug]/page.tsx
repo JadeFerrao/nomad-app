@@ -307,13 +307,13 @@ export default function DestinationArticle() {
                  ) : (
                    <>
                      <img src={stImages[0]} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="Stay" />
-                     <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(10,10,10,1) 20%, rgba(10,10,10,0.4) 60%, transparent 100%)" }} />
+                     <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(10,10,10,0.98) 0%, rgba(10,10,10,0.7) 40%, rgba(10,10,10,0.3) 70%, transparent 100%)" }} />
                    </>
                  )}
-                 <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "var(--space-10)", zIndex: 10 }}>
-                   <div style={{ display: "grid", gap: "var(--space-8)" }} className="stay-grid">
-                     <div style={{ display: "flex", alignItems: "flex-start", gap: "var(--space-3)", marginBottom: "var(--space-4)" }}>
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="1.5" style={{ marginTop: "4px" }}><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><path d="M9 22V12h6v10" /></svg>
+                 <div style={{ position: "absolute", bottom: "var(--space-6)", left: 0, right: 0, padding: "0 var(--space-10)", zIndex: 10 }}>
+                   <div style={{ display: "grid", gap: "var(--space-6)" }} className="stay-grid">
+                     <div style={{ display: "flex", alignItems: "flex-start", gap: "var(--space-3)" }}>
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="1.5" style={{ marginTop: "4px", flexShrink: 0 }}><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><path d="M9 22V12h6v10" /></svg>
                         <h4 style={{ fontFamily: "var(--font-serif)", fontSize: "var(--text-2xl)", color: "var(--color-white)", lineHeight: 1.15 }}>Where to Stay</h4>
                      </div>
                      <p style={{ fontFamily: "var(--font-sans)", fontSize: "var(--text-lg)", color: "var(--color-cloud)", margin: 0, fontWeight: 300, lineHeight: 1.6 }}>
@@ -364,9 +364,30 @@ export default function DestinationArticle() {
           }
         }
         
-        @media (min-width: 1024px) { .grid-layout { grid-template-columns: 1.8fr 1fr !important; } }
-        @media (max-width: 767px) { .stay-grid { grid-template-columns: 1fr !important; } }
-        @media (min-width: 768px) { .stay-grid { grid-template-columns: 1fr 2fr !important; gap: var(--space-10) !important; align-items: center !important; } }
+        @media (max-width: 767px) {
+          .grid-layout {
+            padding-left: var(--space-5) !important;
+            padding-right: var(--space-5) !important;
+          }
+          .stay-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+        
+        @media (min-width: 768px) {
+          .stay-grid {
+            grid-template-columns: 1fr 2fr !important;
+            gap: var(--space-10) !important;
+            align-items: center !important;
+          }
+        }
+        
+        @media (min-width: 1024px) {
+          .grid-layout {
+            grid-template-columns: 1.8fr 1fr !important;
+          }
+        }
+        
         .hover-card:hover { border-color: rgba(200, 165, 90, 0.4) !important; background: rgba(255, 255, 255, 0.05) !important; transform: translateY(-2px); }
         .hover-btn:hover { box-shadow: 0 0 24px rgba(200, 165, 90, 0.3); transform: translateY(-1px); }
         .slide-btn { width: 50px; height: 50px; border-radius: 25px; background: rgba(255,255,255,0.1); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; color: white; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.3s ease; }

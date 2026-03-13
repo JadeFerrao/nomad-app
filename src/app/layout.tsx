@@ -16,7 +16,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Nomad — Travel Reimagined | Curated Itinerary Planner",
+  title: "Nomad | Curated Itinerary Planner",
   description:
     "Craft your perfect journey with Nomad. Mix luxury stays with street food adventures. Curated itineraries for 150+ destinations, tailored to your budget and style.",
   keywords: [

@@ -70,7 +70,7 @@ const features = [
 const st: Record<string, React.CSSProperties> = {
   section: {
     position: "relative",
-    padding: "var(--space-24) 0",
+    padding: "var(--space-12) 0",
     background: "var(--color-black)",
   },
   container: {
@@ -80,7 +80,7 @@ const st: Record<string, React.CSSProperties> = {
   },
   header: {
     textAlign: "center" as const,
-    marginBottom: "var(--space-16)",
+    marginBottom: "var(--space-10)",
   },
   label: {
     fontFamily: "var(--font-sans)",

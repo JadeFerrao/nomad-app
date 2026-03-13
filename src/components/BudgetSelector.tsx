@@ -134,7 +134,6 @@ const destinations: Destination[] = [
   { value: "goa", label: "Goa", country: "India", region: "Asia", image: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=400&q=80", lat: 15.2993, lng: 74.1240 },
   { value: "himachal", label: "Himachal Pradesh", country: "India", region: "Asia", image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=400&q=80", lat: 31.1048, lng: 77.1734 },
   { value: "bali", label: "Ubud", country: "Indonesia", region: "Asia", image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=400&q=80", lat: -8.5069, lng: 115.2625 },
-  { value: "dubai", label: "Dubai", country: "UAE", region: "Asia", image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400&q=80", lat: 25.2048, lng: 55.2708 },
   { value: "phnom_penh", label: "Phnom Penh", country: "Cambodia", region: "Asia", image: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=400&q=80", lat: 11.5564, lng: 104.9282 },
   { value: "cebu", label: "Cebu", country: "Philippines", region: "Asia", image: "https://images.unsplash.com/photo-1621414050345-53db43f7e7ab?w=400&q=80", lat: 10.3157, lng: 123.8854 },
   { value: "assam", label: "Assam", country: "India", region: "Asia", image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=400&q=80", lat: 26.2441, lng: 92.5378 },
@@ -145,8 +144,10 @@ const destinations: Destination[] = [
   { value: "hanoi", label: "Hanoi", country: "Vietnam", region: "Asia", image: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=400&q=80", lat: 21.0285, lng: 105.8542 },
   { value: "elNido", label: "El Nido", country: "Philippines", region: "Asia", image: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=400&q=80", lat: 11.1927, lng: 119.4124 },
   { value: "manila", label: "Manila", country: "Philippines", region: "Asia", image: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=400&q=80", lat: 14.5995, lng: 120.9842 },
-  { value: "muscat", label: "Muscat", country: "Oman", region: "Asia", image: "https://images.unsplash.com/photo-1591608971362-f08b2a75731a?w=400&q=80", lat: 23.5859, lng: 58.4059 },
-  { value: "doha", label: "Doha", country: "Qatar", region: "Asia", image: "https://images.unsplash.com/photo-1549693578-d683be217e58?w=400&q=80", lat: 25.2854, lng: 51.531 },
+  { value: "muscat", label: "Muscat", country: "Oman", region: "Middle East", image: "https://images.unsplash.com/photo-1591608971362-f08b2a75731a?w=400&q=80", lat: 23.5859, lng: 58.4059 },
+  { value: "doha", label: "Doha", country: "Qatar", region: "Middle East", image: "https://images.unsplash.com/photo-1549693578-d683be217e58?w=400&q=80", lat: 25.2854, lng: 51.531 },
+  { value: "manama", label: "Manama", country: "Bahrain", region: "Middle East", image: "https://images.unsplash.com/photo-1591608971362-f08b2a75731a?w=400&q=80", lat: 26.0667, lng: 50.5577 },
+  { value: "dubai", label: "Dubai", country: "UAE", region: "Middle East", image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400&q=80", lat: 25.2048, lng: 55.2708 },
   { value: "almaty", label: "Almaty", country: "Kazakhstan", region: "Asia", image: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=400&q=80", lat: 43.222, lng: 76.8512 },
   { value: "yerevan", label: "Yerevan", country: "Armenia", region: "Asia", image: "https://images.unsplash.com/photo-1572878157305-a4b0c1b1f1b6?w=400&q=80", lat: 40.1772, lng: 44.5035 },
 
@@ -242,7 +243,7 @@ const categoryInfo: Record<Category, {
 const s: Record<string, React.CSSProperties> = {
   section: {
     position: "relative",
-    padding: "var(--space-24) 0",
+    padding: "var(--space-12) 0",
     background: "var(--color-black)",
   },
   container: {
@@ -252,7 +253,7 @@ const s: Record<string, React.CSSProperties> = {
   },
   header: {
     textAlign: "center" as const,
-    marginBottom: "var(--space-16)",
+    marginBottom: "var(--space-10)",
   },
   label: {
     fontFamily: "var(--font-sans)",
@@ -427,9 +428,9 @@ const s: Record<string, React.CSSProperties> = {
   /* Duration input */
   input: {
     width: "100%",
-    padding: "var(--space-4) var(--space-5)",
+    padding: "var(--space-3) var(--space-4)",
     fontFamily: "var(--font-sans)",
-    fontSize: "var(--text-base)",
+    fontSize: "var(--text-sm)",
     color: "var(--color-white)",
     background: "rgba(255, 255, 255, 0.03)",
     backdropFilter: "blur(8px)",
@@ -438,7 +439,7 @@ const s: Record<string, React.CSSProperties> = {
     borderRadius: "var(--radius-lg)",
     transition: "all 200ms ease",
     outline: "none",
-    height: 66, // Match dropdownBtn height
+    minHeight: 48,
   },
   /* Mix & Match */
   divider: {
@@ -855,14 +856,14 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
                       setEndDate(e.target.value);
                     }
                   }}
-                  style={{ ...s.input, padding: '12px 10px', fontSize: '12px' }}
+                  style={s.input}
                 />
                 <input
                   type="date"
                   value={endDate}
                   min={startDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  style={{ ...s.input, padding: '12px 10px', fontSize: '12px' }}
+                  style={s.input}
                 />
               </div>
             </div>
@@ -1023,12 +1024,14 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
         @media (max-width: 768px) {
           .budget-input-grid {
             grid-template-columns: 1fr !important;
+            gap: var(--space-4) !important;
           }
           .tier-grid {
             grid-template-columns: 1fr !important;
           }
           .date-input-grid {
             grid-template-columns: 1fr !important;
+            gap: var(--space-3) !important;
           }
         }
         @media (min-width: 769px) {
@@ -1036,6 +1039,24 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
             grid-template-columns: 1fr 1fr !important;
           }
         }
+        
+        /* Date input styling */
+        input[type="date"] {
+          color-scheme: dark;
+          display: flex;
+          align-items: center;
+        }
+        
+        input[type="date"]::-webkit-calendar-picker-indicator {
+          filter: invert(1);
+          cursor: pointer;
+          opacity: 0.6;
+        }
+        
+        input[type="date"]::-webkit-calendar-picker-indicator:hover {
+          opacity: 1;
+        }
+        
         .dropdown-option-hover:hover {
           background: rgba(255, 255, 255, 0.04) !important;
         }

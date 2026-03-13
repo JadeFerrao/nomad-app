@@ -15,7 +15,7 @@ gsap.registerPlugin(TextPlugin);
 const heroStyles: Record<string, React.CSSProperties> = {
   section: {
     position: "relative",
-    minHeight: "100vh",
+    minHeight: "85vh",
     display: "flex",
     alignItems: "center",
     overflow: "hidden",
@@ -50,9 +50,9 @@ const heroStyles: Record<string, React.CSSProperties> = {
     gridTemplateColumns: "1fr",
     alignItems: "center",
     gap: "var(--space-10)",
-    minHeight: "100vh",
-    paddingTop: "calc(72px + var(--space-16))",
-    paddingBottom: "var(--space-16)",
+    minHeight: "85vh",
+    paddingTop: "calc(72px + var(--space-8))",
+    paddingBottom: "var(--space-8)",
   },
   textContent: {
     maxWidth: 640,
@@ -108,8 +108,8 @@ const heroStyles: Record<string, React.CSSProperties> = {
     display: "flex",
     alignItems: "center",
     gap: "var(--space-10)",
-    marginTop: "var(--space-12)",
-    paddingTop: "var(--space-8)",
+    marginTop: "var(--space-8)",
+    paddingTop: "var(--space-6)",
     borderTop: "1px solid rgba(255, 255, 255, 0.06)",
   },
   stat: {
@@ -150,7 +150,7 @@ const heroStyles: Record<string, React.CSSProperties> = {
   },
   trustedBy: {
     position: "relative",
-    padding: "var(--space-8) 0",
+    padding: "var(--space-6) 0",
     borderTop: "1px solid rgba(255, 255, 255, 0.05)",
     borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
     background: "rgba(255, 255, 255, 0.02)",
@@ -164,7 +164,7 @@ const heroStyles: Record<string, React.CSSProperties> = {
     textTransform: "uppercase" as const,
     letterSpacing: "0.2em",
     textAlign: "center" as const,
-    marginBottom: "var(--space-6)",
+    marginBottom: "var(--space-4)",
     display: "block",
   },
   logoTrack: {
