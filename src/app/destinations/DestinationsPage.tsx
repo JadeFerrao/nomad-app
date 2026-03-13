@@ -315,62 +315,67 @@ export default function DestinationsPage() {
               const imageLoaded = loadedImageIndices.has(originalIndex);
               
               return (
-                <motion.div
+                <Link 
                   key={dest.slug}
-                  style={s.card}
-                  className="destination-card"
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.5,
-                    delay: i * 0.08,
-                    ease: [0.16, 1, 0.3, 1],
-                  }}
+                  href={`/destinations/${dest.slug}`}
+                  style={{ textDecoration: 'none', cursor: 'pointer' }}
                 >
-                  {!imageLoaded ? (
-                    <div className="skeleton-loader" style={{
-                      width: '100%',
-                      height: 240,
-                      background: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%)',
-                      backgroundSize: '200% 100%',
-                      animation: 'shimmer 1.5s infinite'
-                    }} />
-                  ) : (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={dest.image} alt={dest.city} style={s.cardImage} />
-                  )}
+                  <motion.div
+                    style={s.card}
+                    className="destination-card"
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.5,
+                      delay: i * 0.08,
+                      ease: [0.16, 1, 0.3, 1],
+                    }}
+                  >
+                    {!imageLoaded ? (
+                      <div className="skeleton-loader" style={{
+                        width: '100%',
+                        height: 240,
+                        background: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%)',
+                        backgroundSize: '200% 100%',
+                        animation: 'shimmer 1.5s infinite'
+                      }} />
+                    ) : (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src={dest.image} alt={dest.city} style={s.cardImage} />
+                    )}
 
-                <div style={s.cardBody}>
-                  <span style={s.cardRegion}>{dest.region} · {dest.country}</span>
-                  <h2 style={s.cardCity}>{dest.city}</h2>
-                  <span style={s.cardTagline}>{dest.tagline}</span>
-                  <p style={s.cardDesc}>{dest.description}</p>
+                  <div style={s.cardBody}>
+                    <span style={s.cardRegion}>{dest.region} · {dest.country}</span>
+                    <h2 style={s.cardCity}>{dest.city}</h2>
+                    <span style={s.cardTagline}>{dest.tagline}</span>
+                    <p style={s.cardDesc}>{dest.description}</p>
 
-                  <div style={s.cardMeta}>
-                    <div style={s.metaItem}>
-                      <span style={s.metaLabel}>Best Time</span>
-                      <span style={s.metaValue}>{dest.bestTime}</span>
+                    <div style={s.cardMeta}>
+                      <div style={s.metaItem}>
+                        <span style={s.metaLabel}>Best Time</span>
+                        <span style={s.metaValue}>{dest.bestTime}</span>
+                      </div>
+                      <div style={s.metaItem}>
+                        <span style={s.metaLabel}>Avg. Budget</span>
+                        <span style={s.metaValue}>{dest.avgBudget}</span>
+                      </div>
                     </div>
-                    <div style={s.metaItem}>
-                      <span style={s.metaLabel}>Avg. Budget</span>
-                      <span style={s.metaValue}>{dest.avgBudget}</span>
+
+                    <div style={s.highlights} className="highlights-wrap">
+                      {dest.highlights.map((h) => (
+                        <span key={h} style={s.highlightTag}>{h}</span>
+                      ))}
+                    </div>
+
+                    <div style={s.planBtn} className="plan-dest-btn">
+                      Read Guide & Plan Trip
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                      </svg>
                     </div>
                   </div>
-
-                  <div style={s.highlights} className="highlights-wrap">
-                    {dest.highlights.map((h) => (
-                      <span key={h} style={s.highlightTag}>{h}</span>
-                    ))}
-                  </div>
-
-                  <Link href={`/destinations/${dest.slug}`} style={s.planBtn} className="plan-dest-btn">
-                    Read Guide & Plan Trip
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
-                  </Link>
-                </div>
-              </motion.div>
+                </motion.div>
+              </Link>
             );
             })}
           </div>
@@ -398,6 +403,9 @@ export default function DestinationsPage() {
           .destinations-grid {
             grid-template-columns: repeat(3, 1fr) !important;
           }
+        }
+        .destination-card {
+          cursor: pointer;
         }
         .destination-card:hover {
           border-color: rgba(200, 165, 90, 0.4) !important;
