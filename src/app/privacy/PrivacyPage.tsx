@@ -128,7 +128,7 @@ export default function PrivacyPage() {
               <h2 style={s.sectionTitle}>Cookies and Tracking Technologies</h2>
               <p style={s.paragraph}>
                 We use minimal cookies only for essential website functionality. We do not use tracking cookies,
-                analytics cookies, or advertising cookies. For more details, please see our Cookie Policy.
+                analytics cookies, or advertising cookies.
               </p>
             </div>
 

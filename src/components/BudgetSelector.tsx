@@ -708,7 +708,7 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
     d.setDate(d.getDate() + 5);
     return d.toISOString().split('T')[0];
   });
-  const [people, setPeople] = useState(2);
+  const [people, setPeople] = useState<number | ''>('');
   const [currency, setCurrency] = useState("USD");
   const [error, setError] = useState<string | null>(null);
   const [selections, setSelections] = useState<BudgetSelections>({
@@ -756,6 +756,10 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
   const handleGenerate = () => {
     if (selectedDestinations.length === 0) {
       setError("Please select at least one destination.");
+      return;
+    }
+    if (people === '' || people < 1 || people > 10) {
+      setError("Please enter number of travelers (1-10).");
       return;
     }
     if (!validateRadius(selectedDestinations)) {
@@ -846,7 +850,7 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
             {/* Block 2: Dates */}
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <label style={s.fieldLabel}>Travel Dates (DD/MM/YYYY)</label>
-              <div className="date-input-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
+              <div className="date-input-grid" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                 <input
                   type="date"
                   value={startDate}
@@ -873,43 +877,39 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <label style={s.fieldLabel}>Travelers</label>
               <input
-                type="tel"
-                inputMode="numeric"
-                maxLength={2}
-                value={people.toString()}
-                onClick={(e) => {
-                  const target = e.target as HTMLInputElement;
-                  target.select();
+                type="number"
+                min="1"
+                max="10"
+                placeholder="Enter 1-10"
+                value={people}
+                onFocus={(e) => {
+                  e.target.select();
                 }}
                 onChange={(e) => {
-                  const input = e.target.value;
-                  // Remove all non-numeric characters
-                  const cleaned = input.replace(/\D/g, '');
-                  
-                  if (cleaned === '') {
-                    setPeople(1);
+                  const value = e.target.value;
+                  if (value === '') {
+                    setPeople('');
                     return;
                   }
-                  
-                  // Parse as integer
-                  let num = parseInt(cleaned, 10);
-                  
-                  // Clamp between 1 and 10
-                  if (num < 1) num = 1;
-                  if (num > 10) num = 10;
-                  
-                  setPeople(num);
+                  const num = parseInt(value, 10);
+                  if (!isNaN(num)) {
+                    setPeople(num);
+                  }
                 }}
-                onBlur={() => {
-                  // Ensure valid value on blur
-                  if (people < 1 || isNaN(people)) {
+                onBlur={(e) => {
+                  const value = e.target.value;
+                  if (value === '') {
+                    return;
+                  }
+                  const num = parseInt(value, 10);
+                  if (isNaN(num) || num < 1) {
                     setPeople(1);
+                  } else if (num > 10) {
+                    setPeople(10);
                   }
                 }}
                 style={{
-                  ...s.input, 
-                  WebkitAppearance: "none", 
-                  MozAppearance: "textfield",
+                  ...s.input,
                   fontSize: "var(--text-base)",
                 }}
               />
@@ -1064,8 +1064,9 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
             grid-template-columns: 1fr !important;
           }
           .date-input-grid {
-            grid-template-columns: 1fr 1fr !important;
+            flex-direction: column !important;
             gap: var(--space-3) !important;
+            margin-right: var(--space-4) !important;
           }
         }
         @media (min-width: 769px) {
