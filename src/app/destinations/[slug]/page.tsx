@@ -342,6 +342,40 @@ export default function DestinationArticle() {
                 </span>
               </div>
 
+              <div style={s.panelDivider} />
+
+              <div style={s.statRow}>
+                <span style={s.statLabel}>Visa Information</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <a 
+                    href="https://www.ivisa.com/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    style={{ ...s.statValue, color: 'var(--color-accent)', textDecoration: 'none', fontSize: 'var(--text-sm)' }}
+                    className="visa-link"
+                  >
+                    Indian Citizens →
+                  </a>
+                  <a 
+                    href="https://www.mea.gov.in/images/amb1/visa-facility-for-indian-nationals.pdf"
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    style={{ ...s.statValue, color: 'var(--color-accent)', textDecoration: 'none', fontSize: 'var(--text-sm)' }}
+                    className="visa-link"
+                  >
+                    MEA Visa Guide →
+                  </a>
+                  <a 
+                    href="https://www.passportindex.org/travel-visa-checker/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    style={{ ...s.statValue, color: 'var(--color-accent)', textDecoration: 'none', fontSize: 'var(--text-sm)', marginTop: '4px' }}
+                    className="visa-link"
+                  >
+                    Foreign Nationals →
+                  </a>
+                </div>
+              </div>
 
               <div style={s.panelDivider} />
 
@@ -394,6 +428,10 @@ export default function DestinationArticle() {
         .slide-btn:hover { background: var(--color-accent); color: black; transform: scale(1.05); }
         .hover-brightness { transition: filter 0.3s ease; filter: brightness(0.85); }
         .hover-brightness:hover { filter: brightness(1.1); }
+        .visa-link { transition: all 0.2s ease; }
+        .visa-link:hover { color: var(--color-accent-dark) !important; text-decoration: underline !important; }
+        .visa-link-secondary { transition: all 0.2s ease; opacity: 0.8; }
+        .visa-link-secondary:hover { opacity: 1; text-decoration: underline !important; }
       `}</style>
     </>
   );

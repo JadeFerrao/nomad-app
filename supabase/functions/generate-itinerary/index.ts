@@ -122,8 +122,8 @@ Return ONLY pure JSON data.
   "total_budget": "Total estimated budget INCLUDING flight for all ${people} people in ${currency} (include symbol e.g. ₹5,25,000)",
   "approx_flight_budget": "Approx total flight ticket cost for ${people} people in ${currency}",
   "requirements": [
-    "Requirement 1 (MUST be factual Visa information for Indian citizens visiting ${destString})",
-    "Requirement 2 (MUST be factual Visa information for Western/Foreign citizens visiting ${destString})",   
+    "Requirement 1 (MUST be factual Visa information for Indian citizens visiting ${destString}. Include: https://www.ivisa.com/ and https://www.mea.gov.in/images/amb1/visa-facility-for-indian-nationals.pdf)",
+    "Requirement 2 (MUST be factual Visa information for Western/Foreign citizens visiting ${destString}. Include: https://www.passportindex.org/travel-visa-checker/)",   
     "Requirement 3 (Travel Insurance recommended)",
     "Seasonal tip for traveling to ${destString} during ${dateRangeStr}"
   ],
