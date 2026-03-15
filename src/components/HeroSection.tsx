@@ -281,7 +281,7 @@ export default function HeroSection() {
 
       // Typing animation for subtext
       if (subtextRef.current) {
-        const text = "Craft your perfect journey with intelligently curated itineraries. Mix luxury stays with street food adventures — travel your way.";
+        const text = "Craft your perfect journey with intelligently curated itineraries. Mix luxury stays with street food adventures and travel your way.";
         subtextRef.current.textContent = "";
 
         gsap.to(subtextRef.current, {
@@ -333,7 +333,7 @@ export default function HeroSection() {
 
             <p ref={subtextRef} style={heroStyles.subtext}>
               Craft your perfect journey with intelligently curated itineraries.
-              Mix luxury stays with street food adventures — travel your way.
+              Mix luxury stays with street food adventures and travel your way.
             </p>
 
             <div style={heroStyles.actions}>

@@ -211,7 +211,7 @@ export default function FeaturesSection() {
           <p style={st.label}>Why Nomad</p>
           <h2 style={st.title}>
             <span ref={travelPlanningRef} style={{ display: 'inline-block' }}>Travel Planning,</span>{' '}
-            <span ref={perfectedRef} style={{ display: 'inline-block' }}>Perfected</span>
+            <span ref={perfectedRef} style={{ display: 'inline-block' }}>Perfected !</span>
           </h2>
           <p style={st.subtitle}>
             We believe every journey should feel personal. Here&apos;s what makes Nomad different.

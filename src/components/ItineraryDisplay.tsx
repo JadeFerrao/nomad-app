@@ -25,6 +25,23 @@ const ExploreIconSm = () => (
   </svg>
 );
 
+const ShopIconSm = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+    <line x1="3" y1="6" x2="21" y2="6" />
+    <path d="M16 10a4 4 0 01-8 0" />
+  </svg>
+);
+
+const MoveIconSm = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="5.5" cy="17.5" r="3.5" />
+    <circle cx="18.5" cy="17.5" r="3.5" />
+    <path d="M15 6a1 1 0 100-2 1 1 0 000 2zm-3 11.5L9 11l3-2 2 3h4" />
+    <path d="M9 11L5.5 17.5" />
+  </svg>
+);
+
 const PencilIcon = () => (
   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
@@ -48,12 +65,12 @@ const DownloadIcon = () => (
 
 
 /* ── Types ── */
-type BudgetTier = "budget" | "mid" | "luxury";
-
 interface BudgetSelections {
-  stay: BudgetTier;
-  eat: BudgetTier;
-  explore: BudgetTier;
+  stay: string;
+  eat: string;
+  explore: string;
+  shop: string;
+  move: string;
 }
 
 interface ItineraryDisplayProps {
@@ -73,9 +90,9 @@ const destinationData: Record<
     image: string;
     days: Array<{
       title: string;
-      stay: Record<BudgetTier, { name: string; image: string; price: string }>;
-      eat: Record<BudgetTier, { name: string; image: string; price: string }>;
-      explore: Record<BudgetTier, { name: string; image: string; price: string }>;
+      stay: Record<string, { name: string; image: string; price: string }>;
+      eat: Record<string, { name: string; image: string; price: string }>;
+      explore: Record<string, { name: string; image: string; price: string }>;
     }>;
   }
 > = {
@@ -454,34 +471,74 @@ const destinationData: Record<
 };
 
 /* ── Styles ── */
-const tierColors: Record<BudgetTier, string> = {
+const tierColors: Record<string, string> = {
   budget: "var(--color-budget)",
+  boutique: "var(--color-mid)",
   mid: "var(--color-mid)",
   luxury: "var(--color-luxury)",
+  street: "var(--color-budget)",
+  "cafe-bistro": "var(--color-mid)",
+  restaurants: "var(--color-luxury)",
+  nature: "var(--color-budget)",
+  "hidden-gems": "var(--color-mid)",
+  iconic: "var(--color-luxury)",
+  market: "var(--color-budget)",
+  vintage: "var(--color-mid)",
+  public: "var(--color-budget)",
+  private: "var(--color-mid)",
+  active: "var(--color-luxury)",
 };
 
-const tierBgColors: Record<BudgetTier, string> = {
+const tierBgColors: Record<string, string> = {
   budget: "var(--color-budget-bg)",
+  boutique: "var(--color-mid-bg)",
   mid: "var(--color-mid-bg)",
   luxury: "var(--color-luxury-bg)",
+  street: "var(--color-budget-bg)",
+  "cafe-bistro": "var(--color-mid-bg)",
+  restaurants: "var(--color-luxury-bg)",
+  nature: "var(--color-budget-bg)",
+  "hidden-gems": "var(--color-mid-bg)",
+  iconic: "var(--color-luxury-bg)",
+  market: "var(--color-budget-bg)",
+  vintage: "var(--color-mid-bg)",
+  public: "var(--color-budget-bg)",
+  private: "var(--color-mid-bg)",
+  active: "var(--color-luxury-bg)",
 };
 
-const tierLabels: Record<BudgetTier, string> = {
+const tierLabels: Record<string, string> = {
   budget: "Budget",
+  boutique: "Boutique",
   mid: "Mid-Range",
   luxury: "Luxury",
+  street: "Street",
+  "cafe-bistro": "Cafe & Bistro",
+  restaurants: "Fine Dining",
+  nature: "Nature",
+  "hidden-gems": "Hidden Gems",
+  iconic: "Iconic",
+  market: "Market",
+  vintage: "Vintage",
+  public: "Public",
+  private: "Private",
+  active: "Active",
 };
 
 const categoryIcons: Record<string, React.ReactNode> = {
   stay: <StayIconSm />,
   eat: <EatIconSm />,
   explore: <ExploreIconSm />,
+  shop: <ShopIconSm />,
+  move: <MoveIconSm />,
 };
 
 const categoryLabels: Record<string, string> = {
   stay: "Stay",
   eat: "Eat",
   explore: "Explore",
+  shop: "Shop",
+  move: "Move",
 };
 
 const st: Record<string, React.CSSProperties> = {
@@ -736,8 +793,8 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
       displayDays.forEach((day: any, dayIndex: number) => {
         categories.forEach((cat) => {
           const tier = selections[cat];
-          const item = day[cat][tier];
-          if (item.image) {
+          const item = day[cat]?.[tier];
+          if (item?.image) {
             imagePromises.push(
               getBase64Image(item.image).then(base64 => ({
                 cat,
@@ -828,7 +885,8 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
               <div style="display: flex; flex-direction: column; gap: 16px;">
                 ${categories.map((cat) => {
                   const tier = selections[cat];
-                  const item = day[cat][tier];
+                  const item = day[cat]?.[tier];
+                  if (!item) return '';
                   const categoryColors = {
                     stay: '#28a745',
                     eat: '#fd7e14', 
@@ -1174,7 +1232,8 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
 
       categories.forEach((cat) => {
         const tier = selections[cat];
-        const item = day[cat][tier];
+        const item = day[cat]?.[tier];
+        if (!item) return;
         const categoryColors = {
           stay: '#28a745',
           eat: '#fd7e14', 
@@ -1221,6 +1280,27 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
   const data = itineraryData;
   if (!data) return null;
 
+  // Cab suggestions based on destination
+  const getCabSuggestions = (dest: string): { name: string; url: string; color: string }[] => {
+    const d = dest.toLowerCase();
+    if (["mumbai","delhi","bangalore","goa","pune","kerala","kashmir","rajasthan","gujarat","himachal","sikkim","nagaland","orissa","assam","bhutan"].some(x => d.includes(x)))
+      return [{ name: "Ola", url: "https://www.olacabs.com/", color: "#1aad19" }, { name: "Uber", url: "https://www.uber.com/in/en/", color: "#276ef1" }, { name: "Rapido", url: "https://www.rapido.bike/", color: "#f5a623" }];
+    if (["bali","ubud","jakarta","manila","cebu","el nido","hanoi","ho chi minh","kuala lumpur","singapore","bangkok","phnom penh"].some(x => d.includes(x)))
+      return [{ name: "Grab", url: "https://www.grab.com/", color: "#00b14f" }, { name: "Gojek", url: "https://www.gojek.com/", color: "#00aed6" }, { name: "Uber", url: "https://www.uber.com/", color: "#276ef1" }];
+    if (["dubai","abu dhabi","doha","muscat","manama","riyadh"].some(x => d.includes(x)))
+      return [{ name: "Careem", url: "https://www.careem.com/", color: "#5bba47" }, { name: "Uber", url: "https://www.uber.com/", color: "#276ef1" }, { name: "inDrive", url: "https://indrive.com/", color: "#888" }];
+    if (["paris","rome","london","madrid","lisbon","amsterdam","vienna","berlin","athens","istanbul","barcelona","prague","budapest","warsaw","stockholm","helsinki","tbilisi","belgrade","bratislava","sofia","cappadocia","moscow"].some(x => d.includes(x)))
+      return [{ name: "Uber", url: "https://www.uber.com/", color: "#276ef1" }, { name: "Bolt", url: "https://bolt.eu/", color: "#34d186" }, { name: "FreeNow", url: "https://free-now.com/", color: "#ff6600" }];
+    if (["new york","nyc","toronto","vancouver","mexico","lima","santiago","san jose"].some(x => d.includes(x)))
+      return [{ name: "Uber", url: "https://www.uber.com/", color: "#276ef1" }, { name: "Lyft", url: "https://www.lyft.com/", color: "#ff00bf" }, { name: "inDrive", url: "https://indrive.com/", color: "#888" }];
+    if (["auckland","queenstown","wellington","sydney","melbourne"].some(x => d.includes(x)))
+      return [{ name: "Uber", url: "https://www.uber.com/", color: "#276ef1" }, { name: "Ola", url: "https://ola.com.au/", color: "#1aad19" }, { name: "DiDi", url: "https://www.didiglobal.com/", color: "#ff6600" }];
+    if (["cairo","mauritius","madagascar","dar es salaam","nairobi"].some(x => d.includes(x)))
+      return [{ name: "Uber", url: "https://www.uber.com/", color: "#276ef1" }, { name: "Bolt", url: "https://bolt.eu/", color: "#34d186" }, { name: "inDrive", url: "https://indrive.com/", color: "#888" }];
+    return [{ name: "Uber", url: "https://www.uber.com/", color: "#276ef1" }, { name: "Bolt", url: "https://bolt.eu/", color: "#34d186" }];
+  };
+  const cabSuggestions = getCabSuggestions(destination);
+
   const recalculateBudget = async (updatedData: any) => {
     setIsRecalculating(true);
     try {
@@ -1266,7 +1346,7 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
   const displayDays = data.days.slice(0, days).map((dayData: any, i: number) => {
     return { ...dayData, number: i + 1 };
   });
-  const categories: Array<"stay" | "eat" | "explore"> = ["stay", "eat", "explore"];
+  const categories: Array<"stay" | "eat" | "explore" | "shop" | "move"> = ["stay", "eat", "explore", "shop", "move"];
 
   return (
     <section id="itinerary" style={st.section}>
@@ -1403,8 +1483,8 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
                   gap: '8px',
                   marginTop: 'var(--space-4)',
                   padding: '10px',
-                  background: '#0b8af9ff', // Skyscanner cyan
-                  color: '#000',
+                  background: '#0b8af9ff',
+                  color: '#fff',
                   borderRadius: '8px',
                   textDecoration: 'none',
                   fontFamily: 'var(--font-sans)',
@@ -1416,8 +1496,49 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
                 onMouseLeave={(e) => e.currentTarget.style.filter = 'none'}
               >
                 <img src="/skyscanner.svg" alt="Skyscanner" style={{ height: 16 }} />
-                {/* Compare Flights on Skyscanner */}
               </a>
+
+              {/* Cab suggestions */}
+              <div style={{ marginTop: 'var(--space-4)' }}>
+                <p style={{ fontFamily: 'var(--font-sans)', fontSize: '11px', color: 'var(--color-ash)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>
+                  Suggested Rides
+                </p>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  {cabSuggestions.map((cab) => (
+                    <a
+                      key={cab.name}
+                      href={cab.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '7px 14px',
+                        borderRadius: '20px',
+                        background: `${cab.color}18`,
+                        border: `1px solid ${cab.color}40`,
+                        color: cab.color === '#276ef1' ? '#6fa3f7' : cab.color,
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        textDecoration: 'none',
+                        transition: 'all 0.2s ease',
+                        whiteSpace: 'nowrap' as const,
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = `${cab.color}30`; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = `${cab.color}18`; }}
+                    >
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
+                        <polyline points="15 3 21 3 21 9" />
+                        <line x1="10" y1="14" x2="21" y2="3" />
+                      </svg>
+                      {cab.name}
+                    </a>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <p style={{ color: 'var(--color-ash)', fontSize: '12px', marginTop: 'var(--space-4)', fontFamily: 'var(--font-sans)' }}>
@@ -1494,7 +1615,8 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
               <div style={st.dayItems} className="itinerary-day-grid">
                 {categories.map((cat) => {
                   const tier = selections[cat];
-                  const item = day[cat][tier];
+                  const item = day[cat]?.[tier];
+                  if (!item) return null;
                   return (
                     <motion.div
                       key={cat}

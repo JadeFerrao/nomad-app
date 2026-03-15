@@ -14,9 +14,11 @@ import { supabase } from "@/lib/supabase";
 type BudgetTier = "budget" | "mid" | "luxury";
 
 interface BudgetSelections {
-  stay: BudgetTier;
-  eat: BudgetTier;
-  explore: BudgetTier;
+  stay: string;
+  eat: string;
+  explore: string;
+  shop: string;
+  move: string;
 }
 
 interface TripData {

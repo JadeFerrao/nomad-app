@@ -41,7 +41,9 @@ Itinerary Data:
 ${JSON.stringify(itinerary.days.map((d: any) => ({ 
   stay: d.stay.name, 
   eat: d.eat.name, 
-  explore: d.explore.name 
+  explore: d.explore.name,
+  shop: d.shop?.name,
+  move: d.move?.name
 })))}
 
 Return ONLY a JSON object:
@@ -110,9 +112,11 @@ CRITICAL: EVERY price field MUST include the currency symbol (e.g. "$150", "₹1
 CRITICAL: EVERY item MUST have a "location_url" field which is a valid Google Maps search URL (e.g. "https://www.google.com/maps/search/?api=1&query=Hotel+Eiffel+Seine+Paris").
 
 The user has selected the following layout for their budget: 
-- Stay (Accommodation): ${selections.stay} (Note: budget = Hostels, mid = 2-4 Star Hotels, luxury = High-end 5-7 Star Hotels)
-- Eat (Dining): ${selections.eat} (Note: budget = Street Food, mid = 2-4 Star Restaurants, luxury = High-end 5-7 Star Restaurants)
-- Explore (Transport & Day Tours): ${selections.explore} (Note: budget = Public Transport, mid = Cabs, luxury = Private Cabs or Coaches)
+- Stay (Accommodation): ${selections.stay} (Note: budget = Hostels, boutique = 3-4 Star Boutique Hotels, luxury = High-end 5-7 Star Hotels)
+- Eat (Dining): ${selections.eat} (Note: street = Street Food & Local Eateries, cafe-bistro = Casual Cafes & Bistros, restaurants = Fine Dining Restaurants)
+- Explore (Activities): ${selections.explore} (Note: nature = Nature & Outdoor Activities, hidden-gems = Hidden Gems & Local Experiences, iconic = Iconic Landmarks & Tourist Attractions)
+- Shop (Shopping): ${selections.shop} (Note: market = Local Markets & Bazaars, vintage = Vintage & Boutique Shops, luxury = Luxury Malls with Designer Brands - Bags & Watches)
+- Move (Transportation): ${selections.move} (Note: public = Public Transport like Buses & Metros, private = Private Cabs & Taxis, active = Active Transport like Bicycles & E-Scooters)
 
 Generate a JSON object with the following structure. Pay close attention to the budget preferences and provide realistic options that fit those tiers for a group of ${people} people.
 Return ONLY pure JSON data.
@@ -142,7 +146,17 @@ Return ONLY pure JSON data.
         "location_url": "Google Maps search URL"
       },
       "explore": {
-        "name": "Activity/Transport in ${selections.explore} tier",
+        "name": "Activity in ${selections.explore} tier",
+        "price": "Price in ${currency} with symbol",
+        "location_url": "Google Maps search URL"
+      },
+      "shop": {
+        "name": "Shopping location in ${selections.shop} tier",
+        "price": "Price in ${currency} with symbol",
+        "location_url": "Google Maps search URL"
+      },
+      "move": {
+        "name": "Transportation option in ${selections.move} tier",
         "price": "Price in ${currency} with symbol",
         "location_url": "Google Maps search URL"
       }
@@ -151,6 +165,7 @@ Return ONLY pure JSON data.
 }
 
 CRITICAL: Return exactly ${days} days in the "days" array to match the selected duration.
+CRITICAL: EVERY day object MUST include ALL 5 fields: stay, eat, explore, shop, move. Do NOT omit any field.
 CRITICAL: Use ONLY factual, up-to-date visa information. If a country is Visa-free or VOA, state it explicitly for both Indian and Foreign citizens.
 
 
@@ -212,7 +227,9 @@ Make sure there are exactly ${days} items in the "days" array. Avoid generic nam
         const fallbackImages: Record<string, string> = {
           hotel: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500&h=300&fit=crop',
           restaurant: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=500&h=300&fit=crop',
-          attraction: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=500&h=300&fit=crop'
+          attraction: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=500&h=300&fit=crop',
+          shopping: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=500&h=300&fit=crop',
+          transport: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=500&h=300&fit=crop'
         };
         return fallbackImages[type] || fallbackImages.attraction;
         
@@ -222,7 +239,9 @@ Make sure there are exactly ${days} items in the "days" array. Avoid generic nam
         const fallbackImages: Record<string, string> = {
           hotel: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500&h=300&fit=crop',
           restaurant: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=500&h=300&fit=crop',
-          attraction: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=500&h=300&fit=crop'
+          attraction: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=500&h=300&fit=crop',
+          shopping: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=500&h=300&fit=crop',
+          transport: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=500&h=300&fit=crop'
         };
         return fallbackImages[type] || fallbackImages.attraction;
       }
@@ -231,37 +250,57 @@ Make sure there are exactly ${days} items in the "days" array. Avoid generic nam
     // Process parsedContent to add real images from web search
     const processedDays = await Promise.all(parsedContent.days.map(async (day: any) => {
       // Fetch images in parallel for each day
-      const [stayImage, eatImage, exploreImage] = await Promise.all([
-        searchImageForLocation(day.stay.name, destinations[0], 'hotel'),
-        searchImageForLocation(day.eat.name, destinations[0], 'restaurant'),
-        searchImageForLocation(day.explore.name, destinations[0], 'attraction')
+      const [stayImage, eatImage, exploreImage, shopImage, moveImage] = await Promise.all([
+        searchImageForLocation(day.stay?.name || 'hotel', destinations[0], 'hotel'),
+        searchImageForLocation(day.eat?.name || 'restaurant', destinations[0], 'restaurant'),
+        searchImageForLocation(day.explore?.name || 'attraction', destinations[0], 'attraction'),
+        searchImageForLocation(day.shop?.name || 'market', destinations[0], 'shopping'),
+        searchImageForLocation(day.move?.name || 'transport', destinations[0], 'transport')
       ]);
+
+      const fallbackMapUrl = (name: string) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`;
 
       return {
         title: day.title,
         description: day.description,
         stay: {
           [selections.stay]: {
-            name: day.stay.name,
-            price: day.stay.price,
+            name: day.stay?.name || 'Accommodation',
+            price: day.stay?.price || '—',
             image: stayImage,
-            location_url: day.stay.location_url,
+            location_url: day.stay?.location_url || fallbackMapUrl(day.stay?.name || 'hotel'),
           }
         },
         eat: {
           [selections.eat]: {
-            name: day.eat.name,
-            price: day.eat.price,
+            name: day.eat?.name || 'Restaurant',
+            price: day.eat?.price || '—',
             image: eatImage,
-            location_url: day.eat.location_url,
+            location_url: day.eat?.location_url || fallbackMapUrl(day.eat?.name || 'restaurant'),
           }
         },
         explore: {
           [selections.explore]: {
-            name: day.explore.name,
-            price: day.explore.price,
+            name: day.explore?.name || 'Attraction',
+            price: day.explore?.price || '—',
             image: exploreImage,
-            location_url: day.explore.location_url,
+            location_url: day.explore?.location_url || fallbackMapUrl(day.explore?.name || 'attraction'),
+          }
+        },
+        shop: {
+          [selections.shop]: {
+            name: day.shop?.name || 'Local Market',
+            price: day.shop?.price || '—',
+            image: shopImage,
+            location_url: day.shop?.location_url || fallbackMapUrl(day.shop?.name || 'market'),
+          }
+        },
+        move: {
+          [selections.move]: {
+            name: day.move?.name || 'Local Transport',
+            price: day.move?.price || '—',
+            image: moveImage,
+            location_url: day.move?.location_url || fallbackMapUrl(day.move?.name || 'transport'),
           }
         }
       };

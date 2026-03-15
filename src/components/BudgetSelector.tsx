@@ -6,12 +6,19 @@ import { Button } from "@/components/ui/button";
 
 /* ── Types ── */
 type BudgetTier = "budget" | "mid" | "luxury";
-type Category = "stay" | "eat" | "explore";
+type StayTier = "budget" | "boutique" | "luxury";
+type EatTier = "street" | "cafe-bistro" | "restaurants";
+type ExploreTier = "nature" | "hidden-gems" | "iconic";
+type ShopTier = "market" | "vintage" | "luxury";
+type MoveTier = "public" | "private" | "active";
+type Category = "stay" | "eat" | "explore" | "shop" | "move";
 
 interface BudgetSelections {
-  stay: BudgetTier;
-  eat: BudgetTier;
-  explore: BudgetTier;
+  stay: StayTier;
+  eat: EatTier;
+  explore: ExploreTier;
+  shop: ShopTier;
+  move: MoveTier;
 }
 
 interface BudgetSelectorProps {
@@ -38,6 +45,23 @@ const ExploreIcon = ({ color = "currentColor" }: { color?: string }) => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="10" />
     <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+  </svg>
+);
+
+const ShopIcon = ({ color = "currentColor" }: { color?: string }) => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+    <line x1="3" y1="6" x2="21" y2="6" />
+    <path d="M16 10a4 4 0 01-8 0" />
+  </svg>
+);
+
+const MoveIcon = ({ color = "currentColor" }: { color?: string }) => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="5.5" cy="17.5" r="3.5" />
+    <circle cx="18.5" cy="17.5" r="3.5" />
+    <path d="M15 6a1 1 0 100-2 1 1 0 000 2zm-3 11.5L9 11l3-2 2 3h4" />
+    <path d="M9 11L5.5 17.5" />
   </svg>
 );
 
@@ -175,7 +199,7 @@ const destinations: Destination[] = [
 ];
 
 /* ── Tier data ── */
-const tierInfo: Record<BudgetTier, {
+const tierInfo: Record<string, {
   label: string;
   color: string;
   colorBg: string;
@@ -203,38 +227,146 @@ const tierInfo: Record<BudgetTier, {
     colorBorder: "var(--color-luxury-border)",
     icon: <LuxuryBadgeIcon />,
   },
+  boutique: {
+    label: "Boutique",
+    color: "var(--color-mid)",
+    colorBg: "var(--color-mid-bg)",
+    colorBorder: "var(--color-mid-border)",
+    icon: <MidBadgeIcon />,
+  },
+  street: {
+    label: "Street",
+    color: "var(--color-budget)",
+    colorBg: "var(--color-budget-bg)",
+    colorBorder: "var(--color-budget-border)",
+    icon: <BudgetBadgeIcon />,
+  },
+  "cafe-bistro": {
+    label: "Cafe & Bistro",
+    color: "var(--color-mid)",
+    colorBg: "var(--color-mid-bg)",
+    colorBorder: "var(--color-mid-border)",
+    icon: <MidBadgeIcon />,
+  },
+  restaurants: {
+    label: "Fine Dining",
+    color: "var(--color-luxury)",
+    colorBg: "var(--color-luxury-bg)",
+    colorBorder: "var(--color-luxury-border)",
+    icon: <LuxuryBadgeIcon />,
+  },
+  nature: {
+    label: "Nature",
+    color: "var(--color-budget)",
+    colorBg: "var(--color-budget-bg)",
+    colorBorder: "var(--color-budget-border)",
+    icon: <BudgetBadgeIcon />,
+  },
+  "hidden-gems": {
+    label: "Hidden Gems",
+    color: "var(--color-mid)",
+    colorBg: "var(--color-mid-bg)",
+    colorBorder: "var(--color-mid-border)",
+    icon: <MidBadgeIcon />,
+  },
+  iconic: {
+    label: "Iconic",
+    color: "var(--color-luxury)",
+    colorBg: "var(--color-luxury-bg)",
+    colorBorder: "var(--color-luxury-border)",
+    icon: <LuxuryBadgeIcon />,
+  },
+  market: {
+    label: "Market",
+    color: "var(--color-budget)",
+    colorBg: "var(--color-budget-bg)",
+    colorBorder: "var(--color-budget-border)",
+    icon: <BudgetBadgeIcon />,
+  },
+  vintage: {
+    label: "Vintage",
+    color: "var(--color-mid)",
+    colorBg: "var(--color-mid-bg)",
+    colorBorder: "var(--color-mid-border)",
+    icon: <MidBadgeIcon />,
+  },
+  public: {
+    label: "Public",
+    color: "var(--color-budget)",
+    colorBg: "var(--color-budget-bg)",
+    colorBorder: "var(--color-budget-border)",
+    icon: <BudgetBadgeIcon />,
+  },
+  private: {
+    label: "Private",
+    color: "var(--color-mid)",
+    colorBg: "var(--color-mid-bg)",
+    colorBorder: "var(--color-mid-border)",
+    icon: <MidBadgeIcon />,
+  },
+  active: {
+    label: "Active",
+    color: "var(--color-luxury)",
+    colorBg: "var(--color-luxury-bg)",
+    colorBorder: "var(--color-luxury-border)",
+    icon: <LuxuryBadgeIcon />,
+  },
 };
 
 const categoryInfo: Record<Category, {
   label: string;
   icon: (color: string) => React.ReactNode;
-  descriptions: Record<BudgetTier, string>;
+  tiers: string[];
+  descriptions: Record<string, string>;
 }> = {
   stay: {
     label: "Stay",
     icon: (c) => <StayIcon color={c} />,
+    tiers: ["budget", "boutique", "luxury"],
     descriptions: {
       budget: "Hostels & Guesthouses",
-      mid: "3-4 Star Boutique Hotels",
+      boutique: "3-4 Star Boutique Hotels",
       luxury: "Luxurious 5-7 Star Hotels",
     },
   },
   eat: {
     label: "Eat",
     icon: (c) => <EatIcon color={c} />,
+    tiers: ["street", "cafe-bistro", "restaurants"],
     descriptions: {
-      budget: "Street Food & Markets",
-      mid: "Local Cafes & Bistros",
-      luxury: "Fine Dining Experiences",
+      street: "Street Food & Local Eats",
+      "cafe-bistro": "Casual Cafes & Bistros",
+      restaurants: "Fine Dining Restaurants",
     },
   },
   explore: {
     label: "Explore",
     icon: (c) => <ExploreIcon color={c} />,
+    tiers: ["nature", "hidden-gems", "iconic"],
     descriptions: {
-      budget: "Public Transport & Walking",
-      mid: "Cabs & Guided Tours",
-      luxury: "Private Cabs or Coaches",
+      nature: "Nature & Outdoor Activities",
+      "hidden-gems": "Hidden Gems & Local Spots",
+      iconic: "Iconic Landmarks & Attractions",
+    },
+  },
+  shop: {
+    label: "Shop",
+    icon: (c) => <ShopIcon color={c} />,
+    tiers: ["market", "vintage", "luxury"],
+    descriptions: {
+      market: "Local Markets & Bazaars",
+      vintage: "Vintage & Boutique Shops",
+      luxury: "Luxury Malls — Bags & Watches",
+    },
+  },
+  move: {
+    label: "Move",
+    icon: (c) => <MoveIcon color={c} />,
+    tiers: ["public", "private", "active"],
+    descriptions: {
+      public: "Buses & Metros",
+      private: "Private Cabs & Taxis",
+      active: "Bicycles & E-Scooters",
     },
   },
 };
@@ -712,12 +844,14 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
   const [currency, setCurrency] = useState("USD");
   const [error, setError] = useState<string | null>(null);
   const [selections, setSelections] = useState<BudgetSelections>({
-    stay: "mid",
-    eat: "mid",
-    explore: "mid",
+    stay: "boutique",
+    eat: "cafe-bistro",
+    explore: "hidden-gems",
+    shop: "market",
+    move: "public",
   });
 
-  const updateCategory = (cat: Category, tier: BudgetTier) => {
+  const updateCategory = (cat: Category, tier: string) => {
     setSelections((prev) => ({ ...prev, [cat]: tier }));
   };
 
@@ -978,7 +1112,7 @@ export default function BudgetSelector({ onPlanTrip, isLoading }: BudgetSelector
                 </div>
 
                 <div style={s.tierGrid} className="tier-grid">
-                  {(Object.keys(tierInfo) as BudgetTier[]).map((tier) => {
+                  {categoryInfo[cat].tiers.map((tier) => {
                     const isActive = active === tier;
                     const info = tierInfo[tier];
                     return (
