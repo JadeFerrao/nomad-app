@@ -887,10 +887,12 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
                   const tier = selections[cat];
                   const item = day[cat]?.[tier];
                   if (!item) return '';
-                  const categoryColors = {
+                  const categoryColors: Record<string, string> = {
                     stay: '#28a745',
-                    eat: '#fd7e14', 
-                    explore: '#6f42c1'
+                    eat: '#fd7e14',
+                    explore: '#6f42c1',
+                    shop: '#e91e8c',
+                    move: '#2196f3'
                   };
                   const imageKey = `${i}-${cat}`;
                   const base64Image = imageMap[imageKey];
@@ -1234,10 +1236,12 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
         const tier = selections[cat];
         const item = day[cat]?.[tier];
         if (!item) return;
-        const categoryColors = {
+        const categoryColors: Record<string, string> = {
           stay: '#28a745',
-          eat: '#fd7e14', 
-          explore: '#6f42c1'
+          eat: '#fd7e14',
+          explore: '#6f42c1',
+          shop: '#e91e8c',
+          move: '#2196f3'
         };
         
         printWindow.document.write(`
@@ -1333,7 +1337,7 @@ export default function ItineraryDisplay({ destination, days, selections, aiItin
     const newName = window.prompt(`Edit ${category} for Day ${dayIndex + 1}:`, currentItem.name);
     if (newName && newName !== currentItem.name) {
       const newData = { ...itineraryData };
-      const tier = selections[category as keyof BudgetSelections];
+      const tier = selections[category as keyof typeof selections];
       newData.days[dayIndex][category][tier].name = newName;
       // Also update location_url to be safe
       newData.days[dayIndex][category][tier].location_url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(newName)}`;
